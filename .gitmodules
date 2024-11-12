@@ -1,0 +1,3 @@
+[submodule "pedant-solver"]
+	path = pedant-solver
+	url = git@github.com:fslivovsky/pedant-solver.git
