@@ -31,6 +31,6 @@ RUN python3 -m venv venv && \
     . ./venv/bin/activate && \
     pip install --no-cache-dir \
     python-sat \
-    mlpack
-
+    mlpack \
+    numpy
 CMD ["/bin/bash"]

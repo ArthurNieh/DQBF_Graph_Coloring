@@ -14,3 +14,9 @@ mkdir build && cd build
 cmake ..
 make
 ```
+
+```dockerfile
+docker run -it \
+    -v pedant-build:/app/pedant-solver \
+    pedant
+```
