@@ -20,3 +20,4 @@ docker run -it \
     -v pedant-build:/app/pedant-solver \
     pedant
 ```
+Author: ArthurNieh, cycloud0203, Hayooota
