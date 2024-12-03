@@ -105,6 +105,13 @@ class Sudoku:
             for j in range(self.N):
                 print(self.mat[i][j], end=" ")
             print()
+    
+    def dumpSudoku(self):
+        with open("./sample/sudoku.txt", "w") as f:
+            for i in range(self.N):
+                for j in range(self.N):
+                    f.write(str(self.mat[i][j]) + " ")
+                f.write("\n")
 
 # Driver code
 if __name__ == "__main__":
@@ -113,3 +120,4 @@ if __name__ == "__main__":
     sudoku = Sudoku(N, K)
     sudoku.fillValues()
     sudoku.printSudoku()
+    sudoku.dumpSudoku()
