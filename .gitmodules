@@ -1,3 +1,6 @@
 [submodule "pedant-solver"]
 	path = pedant-solver
 	url = git@github.com:fslivovsky/pedant-solver.git
+[submodule "popsatgcpbcp"]
+	path = popsatgcpbcp
+	url = git@github.com:s6dafabe/popsatgcpbcp.git
