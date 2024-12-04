@@ -106,8 +106,8 @@ class Sudoku:
                 print(self.mat[i][j], end=" ")
             print()
     
-    def dumpSudoku(self):
-        with open("./sample/sudoku.txt", "w") as f:
+    def dumpSudoku(self, output_file="./sample/sudoku.txt"):
+        with open(output_file, "w") as f:
             for i in range(self.N):
                 for j in range(self.N):
                     f.write(str(self.mat[i][j]) + " ")
@@ -115,8 +115,9 @@ class Sudoku:
 
 # Driver code
 if __name__ == "__main__":
-    N = 9   # Size of Sudoku
-    K = 40  # Number of digits to be removed
+    N = 16   # Size of Sudoku
+    remove_ratio = 0.2
+    K = int(N*N * remove_ratio)  # Number of digits to be removed
     sudoku = Sudoku(N, K)
     sudoku.fillValues()
     sudoku.printSudoku()
