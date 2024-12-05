@@ -1,17 +1,20 @@
 ### This file is used to generate explicit graph of sudoku
 
 from math import sqrt
+import random
 from sudoku_gen import Sudoku
 
 
 output_file = "./explicit/sudoku_graph.txt"
 sample_file = "./sample/sudoku.txt"
 
-n = 4 # Size of subgrid: n x n
+n = 3 # Size of subgrid: n x n
 N = n*n # Size of Sudoku: N x N
-remove_ratio = 0.3 # Ratio of digits to be removed
+remove_ratio = 0.7 # Ratio of digits to be removed
+wrong_digit_num = 3 # Number of wrong digits to be added
 K = int(N*N * remove_ratio) # Number of digits to be removed
 E = [] # List of edges
+Sudoku_game = [] # List of sudoku game
 count_nonzero = 0
 
 ### Board to graph
@@ -50,7 +53,11 @@ def initialize_sudoku_board():
                             if o == l:
                                 continue
                             E.append(((i*n+k+1)*N+j*n+l, (i*n+m+1)*N+j*n+o))
+    for i in range(N):
+        for j in range(i+1, N):
+            E.append((i, j))
 
+# Add edges for the initial sudoku game
 def add_edge(color:int, node:int):
     for i in range(N):
         if i != color:
@@ -65,7 +72,9 @@ def read_sudoku_game():
         for line in f:
             # print(line)
             row = line.split()
+            Sudoku_game.append(row)
             for i in range(N):
+                # print(row[i])
                 if row[i] == "0":
                     continue
                 elif row[i] != "0" and row[i] <= "9" and row[i] >= "1":
@@ -75,7 +84,21 @@ def read_sudoku_game():
                     print("Invalid input")
                     exit(1)
             count_row += 1
-                    
+
+def add_wrong_edge(num):
+    while(num > 0):
+        color = random.randint(0, N-1)
+        i, j = 0, 0
+        while(Sudoku_game[i][j] != "0"):
+            i = random.randint(0, N-1)
+            j = random.randint(0, N-1)
+        node = (i+1)*N+j
+        # if (color, node) not in E:
+        print(str(node) + " in color " + str(color))
+        for k in range(N):
+            if k != color:
+                E.append((k, node))
+        num -= 1
 
 def print_stats():
     global count_nonzero
@@ -83,7 +106,7 @@ def print_stats():
     print("n = " + str(n))
     print("total edge num = " + str(len(E)))
     theoretical_edge_num = N*N*(3*N-2*n-1)/2
-    print("theoretical edge num = " + str(int(theoretical_edge_num + count_nonzero*(N-1))))
+    print("theoretical edge num = " + str(int(theoretical_edge_num + count_nonzero*(N-1) + N*(N-1)/2)))
 
 def print_graph():
     # print("total edge num = " + str(len(E)))
@@ -104,6 +127,7 @@ if __name__ == "__main__":
     initialize_sudoku_board()
     generate_sudoku()
     read_sudoku_game()
+    add_wrong_edge(wrong_digit_num)
     E.sort(key = lambda x: (x[0], x[1])) # Sort the edges
     # print_graph()
     print_stats()

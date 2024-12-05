@@ -14,14 +14,18 @@ class Sudoku:
         self.mat = [[0 for _ in range(N)] for _ in range(N)]
     
     def fillValues(self):
+        print("Generating Sudoku...")
         # Fill the diagonal of SRN x SRN matrices
         self.fillDiagonal()
+        print("Diagonal filled")
 
         # Fill remaining blocks
         self.fillRemaining(0, self.SRN)
+        print("Remaining filled")
 
         # Remove Randomly K digits to make game
         self.removeKDigits()
+        print(self.K, " digits removed")
     
     def fillDiagonal(self):
         for i in range(0, self.N, self.SRN):
@@ -70,6 +74,7 @@ class Sudoku:
     
         # Move to the next row if we have reached the end of the current row
         if j == self.N:
+            print("Filling remaining: done row ", i)
             i += 1
             j = 0
     
