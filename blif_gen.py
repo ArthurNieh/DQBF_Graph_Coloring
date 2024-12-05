@@ -118,22 +118,146 @@ def boolean_to_blif(fixed_formula, sudoku_results, output_file):
         .names uneqv orE andE
         11 1
         
-        .end
+        # 3*3 constraints
+        .names u[1] u[2] and12
+        00 1
+        01 1
+        10 1
+        .names u[3] u[4] and34
+        00 1
+        01 1
+        10 1
+        .names u[5] u[6] and56
+        00 1
+        01 1
+        10 1
+        .names u[7] u[8] and78
+        00 1
+        01 1
+        10 1
+        .names and12 and34 and56 and78 and12345678
+        1111 1
+        .names and12345678 andE finalE
+        11 1
         """
         blif_content.append(blif)
+        for i in range(1, 10):
+            blif_content.append(f".names c{i} d{i} neq{i}")
+            blif_content.append("00 1")
+            blif_content.append("11 1")
+        blif_content.append(f"""
+        .names neq1 neq2 neq3 neq4 neq5 neq6 neq7 neq8 neq9 cdneq
+        1-------- 1
+        -1------- 1
+        --1------ 1
+        ---1----- 1
+        ----1---- 1
+        -----1--- 1
+        ------1-- 1
+        -------1- 1
+        --------1 1
+        """)
+        blif_content.append("""
+        .names finalE cdneq implE
+        0- 1
+        -1 1
+        """)
+        blif_content.append(".names c1 c2 c3 c4 c5 c6 c7 c8 c9 c123456789")
+        for i in range(1, 10):
+            blif_content.append(f"{'-' * (i - 1)}1{'-' * (9 - i)} 1")
+        for i in range(1, 10):
+            for j in range(i + 1, 10):
+                blif_content.append(f".names c{i} c{j} cnand{i}{j}")
+                blif_content.append("00 1")
+                blif_content.append("01 1")
+                blif_content.append("10 1")
+        blif_content.append(".names cnand12 cnand13 cnand14 cnand15 cnand16 cnand17 cnand18 cnand19 cnand23 cnand24 cnand25 cnand26 cnand27 cnand28 cnand29 cnand34 cnand35 cnand36 cnand37 cnand38 cnand39 cnand45 cnand46 cnand47 cnand48 cnand49 cnand56 cnand57 cnand58 cnand59 cnand67 cnand68 cnand69 cnand78 cnand79 cnand89 cnandall")
+        blif_content.append("111111111111111111111111111111111111 1")
+        blif_content.append(".names d1 d2 d3 d4 d5 d6 d7 d8 d9 d123456789")
+        for i in range(1, 10):
+            blif_content.append(f"{'-' * (i - 1)}1{'-' * (9 - i)} 1")
+        for i in range(1, 10):
+            for j in range(i + 1, 10):
+                blif_content.append(f".names d{i} d{j} dnand{i}{j}")
+                blif_content.append("00 1")
+                blif_content.append("01 1")
+                blif_content.append("10 1")
+        blif_content.append(".names dnand12 dnand13 dnand14 dnand15 dnand16 dnand17 dnand18 dnand19 dnand23 dnand24 dnand25 dnand26 dnand27 dnand28 dnand29 dnand34 dnand35 dnand36 dnand37 dnand38 dnand39 dnand45 dnand46 dnand47 dnand48 dnand49 dnand56 dnand57 dnand58 dnand59 dnand67 dnand68 dnand69 dnand78 dnand79 dnand89 dnandall")
+        blif_content.append("111111111111111111111111111111111111 1")
+        blif_content.append(".names cnandall dnandall implE c123456789 d123456789 implE_out")
+        blif_content.append("11111 1")
         
+        blif_content.append(f"""
+        .names u[0] v[0] phieq0
+        11 1
+        00 1
+        .names u[1] v[1] phieq1
+        11 1
+        00 1
+        .names u[2] v[2] phieq2
+        11 1
+        00 1
+        .names u[3] v[3] phieq3
+        11 1
+        00 1
+        .names u[4] v[4] phieq4
+        11 1
+        00 1
+        .names u[5] v[5] phieq5
+        11 1
+        00 1
+        .names u[6] v[6] phieq6
+        11 1
+        00 1
+        .names u[7] v[7] phieq7
+        11 1
+        00 1
+        .names phieq0 phieq1 phieq2 phieq3 phieq4 phieq5 phieq6 phieq7 phieq01234567
+        11111111 1
+        
+        .names c1 d1 cdphieq1
+        11 1
+        00 1
+        .names c2 d2 cdphieq2
+        11 1
+        00 1
+        .names c3 d3 cdphieq3
+        11 1
+        00 1
+        .names c4 d4 cdphieq4
+        11 1
+        00 1
+        .names c5 d5 cdphieq5
+        11 1
+        00 1
+        .names c6 d6 cdphieq6
+        11 1
+        00 1
+        .names c7 d7 cdphieq7
+        11 1
+        00 1
+        .names c8 d8 cdphieq8
+        11 1
+        00 1
+        .names c9 d9 cdphieq9
+        11 1
+        00 1
+        .names cdphieq1 cdphieq2 cdphieq3 cdphieq4 cdphieq5 cdphieq6 cdphieq7 cdphieq8 cdphieq9 cdphieq123456789
+        111111111 1
+        
+        .names phieq01234567 cdphieq123456789 phiimpl
+        0- 1
+        -1 1
+        
+        .names phiimpl implE_out finalE
+        11 1
+        """)
         return blif_content
 
     # Part 2: Handle the results from sudoku_gen.py
     def handle_sudoku_results(results):
+        # initial conditions
         blif_content = []
-        blif_content.append(".model sudoku_part")
-        
-        # Example placeholder logic
-        blif_content.append(".inputs sudoku_in")
-        blif_content.append(".outputs sudoku_out")
-        blif_content.append(".names sudoku_in sudoku_out")
-        blif_content.append("1 1")
         
         return blif_content
 
