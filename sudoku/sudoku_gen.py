@@ -65,7 +65,6 @@ class Sudoku:
             if self.mat[i][j] == num:
                 return False
         return True
-    
    
     def fillRemaining(self, i, j):
         # Check if we have reached the end of the matrix
@@ -74,7 +73,7 @@ class Sudoku:
     
         # Move to the next row if we have reached the end of the current row
         if j == self.N:
-            print("Filling remaining: done row ", i)
+            # print("Filling remaining: done row ", i)
             i += 1
             j = 0
     
@@ -103,6 +102,18 @@ class Sudoku:
                 count -= 1
                 self.mat[i][j] = 0
     
+        return
+
+    def random_fill(self, num):
+        while num > 0:
+            i = self.randomGenerator(self.N) - 1
+            j = self.randomGenerator(self.N) - 1
+            tofill = self.randomGenerator(self.N)
+            if (self.mat[i][j] != 0):
+                continue
+            elif self.checkIfSafe(i, j, tofill):
+                num -= 1
+                self.mat[i][j] = tofill
         return
 
     def printSudoku(self):

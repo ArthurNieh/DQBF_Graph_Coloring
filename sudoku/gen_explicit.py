@@ -10,7 +10,7 @@ sample_file = "./sample/sudoku.txt"
 
 n = 3 # Size of subgrid: n x n
 N = n*n # Size of Sudoku: N x N
-remove_ratio = 0.7 # Ratio of digits to be removed
+remove_ratio = 0.3 # Ratio of digits to be removed
 wrong_digit_num = 3 # Number of wrong digits to be added
 K = int(N*N * remove_ratio) # Number of digits to be removed
 E = [] # List of edges
@@ -31,7 +31,8 @@ def generate_sudoku():
     # Functions import from sudoku_gen.py
     global N, K, sample_file
     sudoku = Sudoku(N, K)
-    sudoku.fillValues()
+    # sudoku.fillValues()
+    sudoku.random_fill(K)
     sudoku.printSudoku()
     sudoku.dumpSudoku(sample_file)
 
@@ -127,7 +128,7 @@ if __name__ == "__main__":
     initialize_sudoku_board()
     generate_sudoku()
     read_sudoku_game()
-    add_wrong_edge(wrong_digit_num)
+    # add_wrong_edge(wrong_digit_num)
     E.sort(key = lambda x: (x[0], x[1])) # Sort the edges
     # print_graph()
     print_stats()
