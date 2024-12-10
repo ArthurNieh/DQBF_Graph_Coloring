@@ -115,7 +115,7 @@ class Sudoku:
 
 # Driver code
 if __name__ == "__main__":
-    N = 16   # Size of Sudoku
+    N = 9   # Size of Sudoku
     remove_ratio = 0.2
     K = int(N*N * remove_ratio)  # Number of digits to be removed
     sudoku = Sudoku(N, K)

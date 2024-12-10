@@ -1,0 +1,696 @@
+
+.model fixed_part
+.inputs u[0] u[1] u[2] u[3] u[4] u[5] u[6] u[7] v[0] v[1] v[2] v[3] v[4] v[5] v[6] v[7] c1 c2 c3 c4 c5 c6 c7 c8 c9 d1 d2 d3 d4 d5 d6 d7 d8 d9
+.outputs f
+        
+        
+        # SPECIFICATION FOR E(u, v)
+        
+# Calculate the differences between u and v
+.names u[0] v[0] diff0
+01 1
+10 1
+.names u[1] v[1] diff1
+01 1
+10 1
+.names u[2] v[2] diff2
+01 1
+10 1
+.names u[3] v[3] diff3
+01 1
+10 1
+.names u[4] v[4] diff4
+01 1
+10 1
+.names u[5] v[5] diff5
+01 1
+10 1
+.names u[6] v[6] diff6
+01 1
+10 1
+.names u[7] v[7] diff7
+01 1
+10 1
+
+.names diff0 diff1 or01
+1- 1
+-1 1
+.names diff2 diff3 or23
+1- 1
+-1 1
+.names diff4 diff5 or45
+1- 1
+-1 1
+.names diff6 diff7 or67
+1- 1
+-1 1
+
+.names or01 or23 or0123
+1- 1
+-1 1
+.names or45 or67 or4567
+1- 1
+-1 1
+
+.names or0123 or4567 uneqv
+1- 1
+-1 1
+        
+        # ux = vx
+.names u[0] v[0] eq0
+11 1
+00 1
+.names u[1] v[1] eq1
+11 1
+00 1
+.names u[2] v[2] eq2
+11 1
+00 1
+.names u[3] v[3] eq3
+11 1
+00 1
+.names eq0 eq1 eq2 eq3 eq0123
+1111 1
+        
+        # uy = vy
+.names u[4] v[4] eq4
+11 1
+00 1
+.names u[5] v[5] eq5
+11 1
+00 1
+.names u[6] v[6] eq6
+11 1
+00 1
+.names u[7] v[7] eq7
+11 1
+00 1
+.names eq4 eq5 eq6 eq7 eq4567
+1111 1
+        
+        # (u_1\equiv v_1)(u_2\equiv v_2)(u_5\equiv v_5)(u_6\equiv v_6)
+.names u[1] v[1] eq11
+11 1
+00 1
+.names u[2] v[2] eq22
+11 1
+00 1
+.names u[5] v[5] eq55
+11 1
+00 1
+.names u[6] v[6] eq66
+11 1
+00 1
+.names eq11 eq22 eq55 eq66 eq11225566
+1111 1
+        
+        # or above 
+.names eq0123 eq4567 eq11225566 orE
+1-- 1
+-1- 1
+--1 1
+        
+        # and uneqv
+.names uneqv orE andE
+11 1
+        
+        # 3*3 constraints
+.names u[1] u[2] and12
+00 1
+01 1
+10 1
+.names u[3] u[4] and34
+00 1
+01 1
+10 1
+.names u[5] u[6] and56
+00 1
+01 1
+10 1
+.names u[7] u[8] and78
+00 1
+01 1
+10 1
+.names and12 and34 and56 and78 and12345678
+1111 1
+.names and12345678 andE finalE
+11 1
+        
+.names c1 d1 neq1
+00 1
+11 1
+.names c2 d2 neq2
+00 1
+11 1
+.names c3 d3 neq3
+00 1
+11 1
+.names c4 d4 neq4
+00 1
+11 1
+.names c5 d5 neq5
+00 1
+11 1
+.names c6 d6 neq6
+00 1
+11 1
+.names c7 d7 neq7
+00 1
+11 1
+.names c8 d8 neq8
+00 1
+11 1
+.names c9 d9 neq9
+00 1
+11 1
+
+.names neq1 neq2 neq3 neq4 neq5 neq6 neq7 neq8 neq9 cdneq
+1-------- 1
+-1------- 1
+--1------ 1
+---1----- 1
+----1---- 1
+-----1--- 1
+------1-- 1
+-------1- 1
+--------1 1
+        
+
+.names finalE cdneq implE
+0- 1
+-1 1
+        
+.names c1 c2 c3 c4 c5 c6 c7 c8 c9 c123456789
+1-------- 1
+-1------- 1
+--1------ 1
+---1----- 1
+----1---- 1
+-----1--- 1
+------1-- 1
+-------1- 1
+--------1 1
+.names c1 c2 cnand12
+00 1
+01 1
+10 1
+.names c1 c3 cnand13
+00 1
+01 1
+10 1
+.names c1 c4 cnand14
+00 1
+01 1
+10 1
+.names c1 c5 cnand15
+00 1
+01 1
+10 1
+.names c1 c6 cnand16
+00 1
+01 1
+10 1
+.names c1 c7 cnand17
+00 1
+01 1
+10 1
+.names c1 c8 cnand18
+00 1
+01 1
+10 1
+.names c1 c9 cnand19
+00 1
+01 1
+10 1
+.names c2 c3 cnand23
+00 1
+01 1
+10 1
+.names c2 c4 cnand24
+00 1
+01 1
+10 1
+.names c2 c5 cnand25
+00 1
+01 1
+10 1
+.names c2 c6 cnand26
+00 1
+01 1
+10 1
+.names c2 c7 cnand27
+00 1
+01 1
+10 1
+.names c2 c8 cnand28
+00 1
+01 1
+10 1
+.names c2 c9 cnand29
+00 1
+01 1
+10 1
+.names c3 c4 cnand34
+00 1
+01 1
+10 1
+.names c3 c5 cnand35
+00 1
+01 1
+10 1
+.names c3 c6 cnand36
+00 1
+01 1
+10 1
+.names c3 c7 cnand37
+00 1
+01 1
+10 1
+.names c3 c8 cnand38
+00 1
+01 1
+10 1
+.names c3 c9 cnand39
+00 1
+01 1
+10 1
+.names c4 c5 cnand45
+00 1
+01 1
+10 1
+.names c4 c6 cnand46
+00 1
+01 1
+10 1
+.names c4 c7 cnand47
+00 1
+01 1
+10 1
+.names c4 c8 cnand48
+00 1
+01 1
+10 1
+.names c4 c9 cnand49
+00 1
+01 1
+10 1
+.names c5 c6 cnand56
+00 1
+01 1
+10 1
+.names c5 c7 cnand57
+00 1
+01 1
+10 1
+.names c5 c8 cnand58
+00 1
+01 1
+10 1
+.names c5 c9 cnand59
+00 1
+01 1
+10 1
+.names c6 c7 cnand67
+00 1
+01 1
+10 1
+.names c6 c8 cnand68
+00 1
+01 1
+10 1
+.names c6 c9 cnand69
+00 1
+01 1
+10 1
+.names c7 c8 cnand78
+00 1
+01 1
+10 1
+.names c7 c9 cnand79
+00 1
+01 1
+10 1
+.names c8 c9 cnand89
+00 1
+01 1
+10 1
+.names cnand12 cnand13 cnand14 cnand15 cnand16 cnand17 cnand18 cnand19 cnand23 cnand24 cnand25 cnand26 cnand27 cnand28 cnand29 cnand34 cnand35 cnand36 cnand37 cnand38 cnand39 cnand45 cnand46 cnand47 cnand48 cnand49 cnand56 cnand57 cnand58 cnand59 cnand67 cnand68 cnand69 cnand78 cnand79 cnand89 cnandall
+111111111111111111111111111111111111 1
+.names d1 d2 d3 d4 d5 d6 d7 d8 d9 d123456789
+1-------- 1
+-1------- 1
+--1------ 1
+---1----- 1
+----1---- 1
+-----1--- 1
+------1-- 1
+-------1- 1
+--------1 1
+.names d1 d2 dnand12
+00 1
+01 1
+10 1
+.names d1 d3 dnand13
+00 1
+01 1
+10 1
+.names d1 d4 dnand14
+00 1
+01 1
+10 1
+.names d1 d5 dnand15
+00 1
+01 1
+10 1
+.names d1 d6 dnand16
+00 1
+01 1
+10 1
+.names d1 d7 dnand17
+00 1
+01 1
+10 1
+.names d1 d8 dnand18
+00 1
+01 1
+10 1
+.names d1 d9 dnand19
+00 1
+01 1
+10 1
+.names d2 d3 dnand23
+00 1
+01 1
+10 1
+.names d2 d4 dnand24
+00 1
+01 1
+10 1
+.names d2 d5 dnand25
+00 1
+01 1
+10 1
+.names d2 d6 dnand26
+00 1
+01 1
+10 1
+.names d2 d7 dnand27
+00 1
+01 1
+10 1
+.names d2 d8 dnand28
+00 1
+01 1
+10 1
+.names d2 d9 dnand29
+00 1
+01 1
+10 1
+.names d3 d4 dnand34
+00 1
+01 1
+10 1
+.names d3 d5 dnand35
+00 1
+01 1
+10 1
+.names d3 d6 dnand36
+00 1
+01 1
+10 1
+.names d3 d7 dnand37
+00 1
+01 1
+10 1
+.names d3 d8 dnand38
+00 1
+01 1
+10 1
+.names d3 d9 dnand39
+00 1
+01 1
+10 1
+.names d4 d5 dnand45
+00 1
+01 1
+10 1
+.names d4 d6 dnand46
+00 1
+01 1
+10 1
+.names d4 d7 dnand47
+00 1
+01 1
+10 1
+.names d4 d8 dnand48
+00 1
+01 1
+10 1
+.names d4 d9 dnand49
+00 1
+01 1
+10 1
+.names d5 d6 dnand56
+00 1
+01 1
+10 1
+.names d5 d7 dnand57
+00 1
+01 1
+10 1
+.names d5 d8 dnand58
+00 1
+01 1
+10 1
+.names d5 d9 dnand59
+00 1
+01 1
+10 1
+.names d6 d7 dnand67
+00 1
+01 1
+10 1
+.names d6 d8 dnand68
+00 1
+01 1
+10 1
+.names d6 d9 dnand69
+00 1
+01 1
+10 1
+.names d7 d8 dnand78
+00 1
+01 1
+10 1
+.names d7 d9 dnand79
+00 1
+01 1
+10 1
+.names d8 d9 dnand89
+00 1
+01 1
+10 1
+.names dnand12 dnand13 dnand14 dnand15 dnand16 dnand17 dnand18 dnand19 dnand23 dnand24 dnand25 dnand26 dnand27 dnand28 dnand29 dnand34 dnand35 dnand36 dnand37 dnand38 dnand39 dnand45 dnand46 dnand47 dnand48 dnand49 dnand56 dnand57 dnand58 dnand59 dnand67 dnand68 dnand69 dnand78 dnand79 dnand89 dnandall
+111111111111111111111111111111111111 1
+.names cnandall dnandall implE c123456789 d123456789 implE_out
+11111 1
+
+.names u[0] v[0] phieq0
+11 1
+00 1
+.names u[1] v[1] phieq1
+11 1
+00 1
+.names u[2] v[2] phieq2
+11 1
+00 1
+.names u[3] v[3] phieq3
+11 1
+00 1
+.names u[4] v[4] phieq4
+11 1
+00 1
+.names u[5] v[5] phieq5
+11 1
+00 1
+.names u[6] v[6] phieq6
+11 1
+00 1
+.names u[7] v[7] phieq7
+11 1
+00 1
+.names phieq0 phieq1 phieq2 phieq3 phieq4 phieq5 phieq6 phieq7 phieq01234567
+11111111 1
+        
+.names c1 d1 cdphieq1
+11 1
+00 1
+.names c2 d2 cdphieq2
+11 1
+00 1
+.names c3 d3 cdphieq3
+11 1
+00 1
+.names c4 d4 cdphieq4
+11 1
+00 1
+.names c5 d5 cdphieq5
+11 1
+00 1
+.names c6 d6 cdphieq6
+11 1
+00 1
+.names c7 d7 cdphieq7
+11 1
+00 1
+.names c8 d8 cdphieq8
+11 1
+00 1
+.names c9 d9 cdphieq9
+11 1
+00 1
+.names cdphieq1 cdphieq2 cdphieq3 cdphieq4 cdphieq5 cdphieq6 cdphieq7 cdphieq8 cdphieq9 cdphieq123456789
+111111111 1
+        
+.names phieq01234567 cdphieq123456789 phiimpl
+0- 1
+-1 1
+        
+.names phiimpl implE_out finalE
+11 1
+        
+.names !u[0] !u[1] !u[2] !u[3] !u[4] !u[5] !u[6] u[7] c5 init01
+111111111 1
+.names !u[0] !u[1] !u[2] !u[3] !u[4] !u[5] u[6] !u[7] c4 init02
+111111111 1
+.names !u[0] !u[1] !u[2] !u[3] !u[4] u[5] !u[6] !u[7] c2 init03
+111111111 1
+.names !u[0] !u[1] !u[2] !u[3] !u[4] u[5] u[6] !u[7] c6 init05
+111111111 1
+.names !u[0] !u[1] !u[2] !u[3] u[4] !u[5] !u[6] !u[7] c8 init06
+111111111 1
+.names !u[0] !u[1] !u[2] !u[3] u[4] !u[5] u[6] !u[7] c9 init08
+111111111 1
+.names !u[0] !u[1] !u[2] u[3] !u[4] !u[5] u[6] !u[7] c9 init12
+111111111 1
+.names !u[0] !u[1] !u[2] u[3] !u[4] u[5] !u[6] !u[7] c1 init13
+111111111 1
+.names !u[0] !u[1] !u[2] u[3] !u[4] u[5] u[6] !u[7] c4 init15
+111111111 1
+.names !u[0] !u[1] !u[2] u[3] u[4] !u[5] !u[6] !u[7] c2 init16
+111111111 1
+.names !u[0] !u[1] !u[2] u[3] u[4] !u[5] !u[6] u[7] c6 init17
+111111111 1
+.names !u[0] !u[1] !u[2] u[3] u[4] !u[5] u[6] !u[7] c5 init18
+111111111 1
+.names !u[0] !u[1] u[2] !u[3] !u[4] !u[5] !u[6] u[7] c6 init21
+111111111 1
+.names !u[0] !u[1] u[2] !u[3] !u[4] !u[5] u[6] !u[7] c2 init22
+111111111 1
+.names !u[0] !u[1] u[2] !u[3] !u[4] u[5] !u[6] !u[7] c5 init23
+111111111 1
+.names !u[0] !u[1] u[2] !u[3] !u[4] u[5] !u[6] u[7] c7 init24
+111111111 1
+.names !u[0] !u[1] u[2] !u[3] !u[4] u[5] u[6] !u[7] c9 init25
+111111111 1
+.names !u[0] !u[1] u[2] !u[3] u[4] !u[5] !u[6] !u[7] c1 init26
+111111111 1
+.names !u[0] !u[1] u[2] !u[3] u[4] !u[5] !u[6] u[7] c3 init27
+111111111 1
+.names !u[0] !u[1] u[2] !u[3] u[4] !u[5] u[6] !u[7] c4 init28
+111111111 1
+.names !u[0] u[1] !u[2] !u[3] !u[4] !u[5] u[6] !u[7] c6 init32
+111111111 1
+.names !u[0] u[1] !u[2] !u[3] !u[4] u[5] !u[6] !u[7] c7 init33
+111111111 1
+.names !u[0] u[1] !u[2] !u[3] !u[4] u[5] !u[6] u[7] c5 init34
+111111111 1
+.names !u[0] u[1] !u[2] !u[3] !u[4] u[5] u[6] !u[7] c8 init35
+111111111 1
+.names !u[0] u[1] !u[2] !u[3] u[4] !u[5] !u[6] !u[7] c9 init36
+111111111 1
+.names !u[0] u[1] !u[2] !u[3] u[4] !u[5] !u[6] u[7] c4 init37
+111111111 1
+.names !u[0] u[1] !u[2] !u[3] u[4] !u[5] u[6] !u[7] c3 init38
+111111111 1
+.names !u[0] u[1] !u[2] u[3] !u[4] !u[5] u[6] !u[7] c8 init42
+111111111 1
+.names !u[0] u[1] !u[2] u[3] !u[4] u[5] !u[6] !u[7] c3 init43
+111111111 1
+.names !u[0] u[1] !u[2] u[3] !u[4] u[5] u[6] !u[7] c2 init45
+111111111 1
+.names !u[0] u[1] !u[2] u[3] u[4] !u[5] !u[6] !u[7] c6 init46
+111111111 1
+.names !u[0] u[1] !u[2] u[3] u[4] !u[5] u[6] !u[7] c1 init48
+111111111 1
+.names !u[0] u[1] u[2] !u[3] !u[4] !u[5] !u[6] !u[7] c3 init50
+111111111 1
+.names !u[0] u[1] u[2] !u[3] !u[4] !u[5] !u[6] u[7] c4 init51
+111111111 1
+.names !u[0] u[1] u[2] !u[3] !u[4] !u[5] u[6] !u[7] c5 init52
+111111111 1
+.names !u[0] u[1] u[2] !u[3] !u[4] u[5] !u[6] !u[7] c9 init53
+111111111 1
+.names !u[0] u[1] u[2] !u[3] !u[4] u[5] !u[6] u[7] c6 init54
+111111111 1
+.names !u[0] u[1] u[2] !u[3] !u[4] u[5] u[6] !u[7] c1 init55
+111111111 1
+.names !u[0] u[1] u[2] !u[3] u[4] !u[5] !u[6] u[7] c2 init57
+111111111 1
+.names !u[0] u[1] u[2] !u[3] u[4] !u[5] u[6] !u[7] c8 init58
+111111111 1
+.names u[0] !u[1] !u[2] !u[3] !u[4] !u[5] !u[6] !u[7] c6 init60
+111111111 1
+.names u[0] !u[1] !u[2] !u[3] !u[4] !u[5] !u[6] u[7] c9 init61
+111111111 1
+.names u[0] !u[1] !u[2] !u[3] !u[4] !u[5] u[6] !u[7] c3 init62
+111111111 1
+.names u[0] !u[1] !u[2] !u[3] !u[4] u[5] !u[6] !u[7] c4 init63
+111111111 1
+.names u[0] !u[1] !u[2] !u[3] !u[4] u[5] u[6] !u[7] c7 init65
+111111111 1
+.names u[0] !u[1] !u[2] !u[3] u[4] !u[5] !u[6] !u[7] c5 init66
+111111111 1
+.names u[0] !u[1] !u[2] !u[3] u[4] !u[5] !u[6] u[7] c8 init67
+111111111 1
+.names u[0] !u[1] !u[2] !u[3] u[4] !u[5] u[6] !u[7] c2 init68
+111111111 1
+.names u[0] !u[1] !u[2] u[3] !u[4] !u[5] !u[6] !u[7] c5 init70
+111111111 1
+.names u[0] !u[1] !u[2] u[3] !u[4] !u[5] u[6] !u[7] c1 init72
+111111111 1
+.names u[0] !u[1] !u[2] u[3] !u[4] u[5] !u[6] !u[7] c6 init73
+111111111 1
+.names u[0] !u[1] !u[2] u[3] !u[4] u[5] !u[6] u[7] c2 init74
+111111111 1
+.names u[0] !u[1] !u[2] u[3] !u[4] u[5] u[6] !u[7] c3 init75
+111111111 1
+.names u[0] !u[1] !u[2] u[3] u[4] !u[5] !u[6] !u[7] c4 init76
+111111111 1
+.names u[0] !u[1] !u[2] u[3] u[4] !u[5] !u[6] u[7] c9 init77
+111111111 1
+.names u[0] !u[1] !u[2] u[3] u[4] !u[5] u[6] !u[7] c7 init78
+111111111 1
+.names u[0] !u[1] u[2] !u[3] !u[4] !u[5] !u[6] !u[7] c4 init80
+111111111 1
+.names u[0] !u[1] u[2] !u[3] !u[4] !u[5] !u[6] u[7] c2 init81
+111111111 1
+.names u[0] !u[1] u[2] !u[3] !u[4] !u[5] u[6] !u[7] c7 init82
+111111111 1
+.names u[0] !u[1] u[2] !u[3] !u[4] u[5] !u[6] !u[7] c8 init83
+111111111 1
+.names u[0] !u[1] u[2] !u[3] !u[4] u[5] !u[6] u[7] c9 init84
+111111111 1
+.names u[0] !u[1] u[2] !u[3] !u[4] u[5] u[6] !u[7] c5 init85
+111111111 1
+.names u[0] !u[1] u[2] !u[3] u[4] !u[5] !u[6] !u[7] c3 init86
+111111111 1
+.names u[0] !u[1] u[2] !u[3] u[4] !u[5] !u[6] u[7] c1 init87
+111111111 1
+.names u[0] !u[1] u[2] !u[3] u[4] !u[5] u[6] !u[7] c6 init88
+111111111 1
+.names init01 init02 init03 init05 init06 init08 init12 init13 init15 init16 init17 init18 init21 init22 init23 init24 init25 init26 init27 init28 init32 init33 init34 init35 init36 init37 init38 init42 init43 init45 init46 init48 init50 init51 init52 init53 init54 init55 init57 init58 init60 init61 init62 init63 init65 init66 init67 init68 init70 init72 init73 init74 init75 init76 init77 init78 init80 init81 init82 init83 init84 init85 init86 init87 init88 final_init
+11111111111111111111111111111111111111111111111111111111111111111 1
+.names final_init finalE
+11 1
+.end
