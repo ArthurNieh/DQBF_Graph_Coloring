@@ -1,8 +1,8 @@
-DQBF Graph coloring
+# DQBF Graph coloring
 
 This project proposed to solve graph coloring problem using state-of-the-art DQBF solver.
 
-Author: ArthurNieh, cycloud0203
+Author: ArthurNieh, cycloud0203, Hayooota
 
 #### Build the solver 
 
@@ -15,9 +15,8 @@ cmake ..
 make
 ```
 
-```dockerfile
-docker run -it \
-    -v pedant-build:/app/pedant-solver \
-    pedant
+## generate blif file
+
+```shell
+python3 blif_gen.py
 ```
-Author: ArthurNieh, cycloud0203, Hayooota

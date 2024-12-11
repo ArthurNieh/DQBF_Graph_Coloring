@@ -262,7 +262,6 @@ def boolean_to_blif(sudoku_results, output_file):
         # initial conditions
         sudoku_lines = np.array([[int(num) for num in line.split()] for line in sudoku_results.strip().split("\n")])
         blif_content = []
-        print(sudoku_lines)
         for i in range(9):
             for j in range(9):
                 if sudoku_lines[i][j] != 0:
@@ -304,6 +303,10 @@ def boolean_to_blif(sudoku_results, output_file):
     
 
 # Example usage
+import subprocess
+
+# Call the sudoku_gen.py script
+subprocess.run(["python3", "sudoku/sudoku_gen.py"])
 
 with open("sample/sudoku.txt", "r") as f:
     sudoku_results = f.read()
