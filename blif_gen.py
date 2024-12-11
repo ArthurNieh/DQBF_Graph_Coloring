@@ -252,7 +252,7 @@ def boolean_to_blif(sudoku_results, output_file):
 0- 1
 -1 1
         
-.names phiimpl implE_out finalE
+.names phiimpl implE_out finalphi
 11 1
         """)
         return blif_content
@@ -292,7 +292,7 @@ def boolean_to_blif(sudoku_results, output_file):
     blif_content = []
     blif_content.extend(handle_fixed_formula())
     blif_content.extend(handle_sudoku_results(sudoku_results))
-    blif_content.append(".names final_init finalE")
+    blif_content.append(".names final_init finalphi f")
     blif_content.append("11 1")
     blif_content.append(".end")
     
