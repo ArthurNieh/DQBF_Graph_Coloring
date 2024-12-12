@@ -6,7 +6,7 @@ def boolean_to_blif(sudoku_results, output_file):
     def handle_fixed_formula():
         blif_content = []
         blif = f"""
-.model fixed_part
+.model fuck_ARTHUR
 .inputs u[0] u[1] u[2] u[3] u[4] u[5] u[6] u[7] v[0] v[1] v[2] v[3] v[4] v[5] v[6] v[7] c1 c2 c3 c4 c5 c6 c7 c8 c9 d1 d2 d3 d4 d5 d6 d7 d8 d9
 .outputs f
         
