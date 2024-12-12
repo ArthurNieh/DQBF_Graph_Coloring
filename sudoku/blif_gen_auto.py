@@ -3,7 +3,7 @@ import math
 
 
 blif_lines = []
-N = 16
+N = 9
 u_num = v_num = math.ceil(math.log2(N)/2) * 4
 c_num = d_num = N
 
@@ -95,14 +95,14 @@ def add_implicit_graph():
         blif_lines.append("U" + str(i) + "=U" + str(i) + " ")
     for i in range(half):
         blif_lines.append("V" + str(i) + "=V" + str(i) + " ")
-    blif_lines.append("O_equal=notsamecolumn\n")
+    blif_lines.append("O_equal=samecolumn\n")
 
     blif_lines.append(".subckt UxequVx ")
     for i in range(half):
         blif_lines.append("U" + str(i) + "=U" + str(half+i) + " ")
     for i in range(half):
         blif_lines.append("V" + str(i) + "=V" + str(half+i) + " ")
-    blif_lines.append("O_equal=notsamerow\n")
+    blif_lines.append("O_equal=samerow\n")
     
     quarter = int(u_num/4)
     blif_lines.append(".subckt UxequVx ")
@@ -116,12 +116,12 @@ def add_implicit_graph():
             blif_lines.append("V" + str(i) + "=V" + str(i) + " ")
         else:
             blif_lines.append("V" + str(i) + "=V" + str(quarter+i) + " ")
-    blif_lines.append("O_equal=notsamebox\n")
+    blif_lines.append("O_equal=samebox\n")
 
     ## TODO modify to exclude unused nodes
 
-    blif_lines.append(".subckt or2 I0=notsamecolumn I1=notsamerow O=notcross\n")
-    blif_lines.append(".subckt or2 I0=notcross I1=notsamebox O=alledges\n")
+    blif_lines.append(".subckt or2 I0=samecolumn I1=samerow O=cross\n")
+    blif_lines.append(".subckt or2 I0=cross I1=samebox O=alledges\n")
     blif_lines.append(".subckt and2 I0=notsamenode I1=alledges O=E\n")
     blif_lines.append(".end\n\n")
     return
