@@ -39,29 +39,15 @@ def boolean_to_blif(sudoku_results, output_file):
 01 1
 10 1
 
-.names diff0 diff1 or01
-1- 1
--1 1
-.names diff2 diff3 or23
-1- 1
--1 1
-.names diff4 diff5 or45
-1- 1
--1 1
-.names diff6 diff7 or67
-1- 1
--1 1
-
-.names or01 or23 or0123
-1- 1
--1 1
-.names or45 or67 or4567
-1- 1
--1 1
-
-.names or0123 or4567 uneqv
-1- 1
--1 1
+.names diff0 diff1 diff2 diff3 diff4 diff5 diff6 diff7 uneqv
+1------- 1
+-1------ 1
+--1----- 1
+---1---- 1
+----1--- 1
+-----1-- 1
+------1- 1
+-------1 1
         
         # ux = vx
 .names u[0] v[0] eq0
@@ -96,16 +82,16 @@ def boolean_to_blif(sudoku_results, output_file):
 1111 1
         
         # (u_1\equiv v_1)(u_2\equiv v_2)(u_5\equiv v_5)(u_6\equiv v_6)
-.names u[1] v[1] eq11
+.names u[0] v[0] eq11
 11 1
 00 1
-.names u[2] v[2] eq22
+.names u[1] v[1] eq22
 11 1
 00 1
-.names u[5] v[5] eq55
+.names u[4] v[4] eq55
 11 1
 00 1
-.names u[6] v[6] eq66
+.names u[5] v[5] eq66
 11 1
 00 1
 .names eq11 eq22 eq55 eq66 eq11225566
@@ -122,19 +108,19 @@ def boolean_to_blif(sudoku_results, output_file):
 11 1
         
         # 3*3 constraints
-.names u[1] u[2] and12
+.names u[0] u[1] and12
 00 1
 01 1
 10 1
-.names u[3] u[4] and34
+.names u[2] u[3] and34
 00 1
 01 1
 10 1
-.names u[5] u[6] and56
+.names u[4] u[5] and56
 00 1
 01 1
 10 1
-.names u[7] u[8] and78
+.names u[6] u[7] and78
 00 1
 01 1
 10 1
@@ -265,22 +251,24 @@ def boolean_to_blif(sudoku_results, output_file):
         for i in range(9):
             for j in range(9):
                 if sudoku_lines[i][j] != 0:
-                    u1u2 = boolean_mapping[i//3]
-                    u3u4 = boolean_mapping[i%3]
-                    u5u6 = boolean_mapping[j//3]
-                    u7u8 = boolean_mapping[j%3]
+                    u1u2 = boolean_mapping[j//3]
+                    u3u4 = boolean_mapping[j%3]
+                    u5u6 = boolean_mapping[i//3]
+                    u7u8 = boolean_mapping[i%3]
+                    print(f"i, j: {i}, {j}, u12, u34, u56, u78 = {i//3}, {i%3}, {j//3}, {j%3}")
+                    print(u1u2, u3u4, u5u6, u7u8)
+                    truth_value = ""
+                    truth_value += u1u2[0]  
+                    truth_value += u1u2[1]  
+                    truth_value += u3u4[0]  
+                    truth_value += u3u4[1]  
+                    truth_value += u5u6[0]  
+                    truth_value += u5u6[1]  
+                    truth_value += u7u8[0]  
+                    truth_value += u7u8[1]  
                     
-                    u1 = "!u[0]" if u1u2[0] == "0" else "u[0]"
-                    u2 = "!u[1]" if u1u2[1] == "0" else "u[1]"
-                    u3 = "!u[2]" if u3u4[0] == "0" else "u[2]"
-                    u4 = "!u[3]" if u3u4[1] == "0" else "u[3]"
-                    u5 = "!u[4]" if u5u6[0] == "0" else "u[4]"
-                    u6 = "!u[5]" if u5u6[1] == "0" else "u[5]"
-                    u7 = "!u[6]" if u7u8[0] == "0" else "u[6]"
-                    u8 = "!u[7]" if u7u8[1] == "0" else "u[7]"
-                    
-                    blif_content.append(f".names {u1} {u2} {u3} {u4} {u5} {u6} {u7} {u8} c{sudoku_lines[i][j]} init{i}{j}")
-                    blif_content.append("111111111 1")
+                    blif_content.append(f".names u[0] u[1] u[2] u[3] u[4] u[5] u[6] u[7] c{sudoku_lines[i][j]} init{i}{j}")
+                    blif_content.append(f"{truth_value}1 1")
         init_conditions = " ".join([f"init{i}{j}" for i in range(9) for j in range(9) if sudoku_lines[i][j] != 0])
         blif_content.append(f".names {init_conditions} final_init")
         blif_content.append("1" * len(init_conditions.split()) + " 1")
