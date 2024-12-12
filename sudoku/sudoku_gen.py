@@ -23,6 +23,8 @@ class Sudoku:
         self.fillRemaining(0, self.SRN)
         print("Remaining filled")
 
+        self.printSudoku()
+
         # Remove Randomly K digits to make game
         self.removeKDigits()
         print(self.K, " digits removed")
