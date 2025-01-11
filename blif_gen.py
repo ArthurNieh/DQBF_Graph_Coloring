@@ -132,8 +132,8 @@ def boolean_to_blif(sudoku_results, output_file):
         blif_content.append(blif)
         for i in range(1, 10):
             blif_content.append(f".names c{i} d{i} neq{i}")
-            blif_content.append("00 1")
-            blif_content.append("11 1")
+            blif_content.append("01 1")
+            blif_content.append("10 1")
         blif_content.append(f"""
 .names neq1 neq2 neq3 neq4 neq5 neq6 neq7 neq8 neq9 cdneq
 1-------- 1
@@ -153,28 +153,28 @@ def boolean_to_blif(sudoku_results, output_file):
         """)
         blif_content.append(".names c1 c2 c3 c4 c5 c6 c7 c8 c9 c123456789")
         for i in range(1, 10):
-            blif_content.append(f"{'-' * (i - 1)}1{'-' * (9 - i)} 1")
-        for i in range(1, 10):
-            for j in range(i + 1, 10):
-                blif_content.append(f".names c{i} c{j} cnand{i}{j}")
-                blif_content.append("00 1")
-                blif_content.append("01 1")
-                blif_content.append("10 1")
-        blif_content.append(".names cnand12 cnand13 cnand14 cnand15 cnand16 cnand17 cnand18 cnand19 cnand23 cnand24 cnand25 cnand26 cnand27 cnand28 cnand29 cnand34 cnand35 cnand36 cnand37 cnand38 cnand39 cnand45 cnand46 cnand47 cnand48 cnand49 cnand56 cnand57 cnand58 cnand59 cnand67 cnand68 cnand69 cnand78 cnand79 cnand89 cnandall")
-        blif_content.append("111111111111111111111111111111111111 1")
+            blif_content.append(f"{'0' * (i - 1)}1{'0' * (9 - i)} 1")
+        # for i in range(1, 10):
+        #     for j in range(i + 1, 10):
+        #         blif_content.append(f".names c{i} c{j} cnand{i}{j}")
+        #         blif_content.append("00 1")
+        #         blif_content.append("01 1")
+        #         blif_content.append("10 1")
+        # blif_content.append(".names cnand12 cnand13 cnand14 cnand15 cnand16 cnand17 cnand18 cnand19 cnand23 cnand24 cnand25 cnand26 cnand27 cnand28 cnand29 cnand34 cnand35 cnand36 cnand37 cnand38 cnand39 cnand45 cnand46 cnand47 cnand48 cnand49 cnand56 cnand57 cnand58 cnand59 cnand67 cnand68 cnand69 cnand78 cnand79 cnand89 cnandall")
+        # blif_content.append("111111111111111111111111111111111111 1")
         blif_content.append(".names d1 d2 d3 d4 d5 d6 d7 d8 d9 d123456789")
         for i in range(1, 10):
-            blif_content.append(f"{'-' * (i - 1)}1{'-' * (9 - i)} 1")
-        for i in range(1, 10):
-            for j in range(i + 1, 10):
-                blif_content.append(f".names d{i} d{j} dnand{i}{j}")
-                blif_content.append("00 1")
-                blif_content.append("01 1")
-                blif_content.append("10 1")
-        blif_content.append(".names dnand12 dnand13 dnand14 dnand15 dnand16 dnand17 dnand18 dnand19 dnand23 dnand24 dnand25 dnand26 dnand27 dnand28 dnand29 dnand34 dnand35 dnand36 dnand37 dnand38 dnand39 dnand45 dnand46 dnand47 dnand48 dnand49 dnand56 dnand57 dnand58 dnand59 dnand67 dnand68 dnand69 dnand78 dnand79 dnand89 dnandall")
-        blif_content.append("111111111111111111111111111111111111 1")
-        blif_content.append(".names cnandall dnandall implE c123456789 d123456789 implE_out")
-        blif_content.append("11111 1")
+            blif_content.append(f"{'0' * (i - 1)}1{'0' * (9 - i)} 1")
+        # for i in range(1, 10):
+        #     for j in range(i + 1, 10):
+        #         blif_content.append(f".names d{i} d{j} dnand{i}{j}")
+        #         blif_content.append("00 1")
+        #         blif_content.append("01 1")
+        #         blif_content.append("10 1")
+        # blif_content.append(".names dnand12 dnand13 dnand14 dnand15 dnand16 dnand17 dnand18 dnand19 dnand23 dnand24 dnand25 dnand26 dnand27 dnand28 dnand29 dnand34 dnand35 dnand36 dnand37 dnand38 dnand39 dnand45 dnand46 dnand47 dnand48 dnand49 dnand56 dnand57 dnand58 dnand59 dnand67 dnand68 dnand69 dnand78 dnand79 dnand89 dnandall")
+        # blif_content.append("111111111111111111111111111111111111 1")
+        blif_content.append(".names implE c123456789 d123456789 implE_out")
+        blif_content.append("111 1")
         
         blif_content.append(f"""
 .names u[0] v[0] phieq0
