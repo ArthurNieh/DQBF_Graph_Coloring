@@ -1,0 +1,174 @@
+.model lsfr
+.inputs u0 u1 u2 u3 u4 u5 u6 u7 u8 u9 u10 u11 u12 u13 u14 u15 v0 v1 v2 v3 v4 v5 v6 v7 v8 v9 v10 v11 v12 v13 v14 v15 c0 c1 c2 d0 d1 d2 
+.outputs f
+.subckt graph U0=u0 U1=u1 U2=u2 U3=u3 U4=u4 U5=u5 U6=u6 U7=u7 U8=u8 U9=u9 U10=u10 U11=u11 U12=u12 U13=u13 U14=u14 U15=u15 V0=v0 V1=v1 V2=v2 V3=v3 V4=v4 V5=v5 V6=v6 V7=v7 V8=v8 V9=v9 V10=v10 V11=v11 V12=v12 V13=v13 V14=v14 V15=v15 E=e1
+.subckt graph U0=v0 U1=v1 U2=v2 U3=v3 U4=v4 U5=v5 U6=v6 U7=v7 U8=v8 U9=v9 U10=v10 U11=v11 U12=v12 U13=v13 U14=v14 U15=v15 V0=u0 V1=u1 V2=u2 V3=u3 V4=u4 V5=u5 V6=u6 V7=u7 V8=u8 V9=u9 V10=u10 V11=u11 V12=u12 V13=u13 V14=u14 V15=u15 E=e2
+.subckt or2 I0=e1 I1=e2 O=e
+.subckt color_not_equal C0=c0 C1=c1 C2=c2 D0=d0 D1=d1 D2=d2 O_nequal=ncolor
+.subckt onehot3 I0=c0 I1=c1 I2=c2 O=conehot
+.subckt onehot3 I0=d0 I1=d1 I2=d2 O=donehot
+.subckt imply I0=e I1=ncolor O=diffcolor
+.subckt and2 I0=conehot I1=donehot O=conehotdonehot
+.subckt UneqV16 U0=u0 U1=u1 U2=u2 U3=u3 U4=u4 U5=u5 U6=u6 U7=u7 U8=u8 U9=u9 U10=u10 U11=u11 U12=u12 U13=u13 U14=u14 U15=u15 V0=v0 V1=v1 V2=v2 V3=v3 V4=v4 V5=v5 V6=v6 V7=v7 V8=v8 V9=v9 V10=v10 V11=v11 V12=v12 V13=v13 V14=v14 V15=v15 O_equal=notsamenode
+.subckt UneqV3 U0=c0 U1=c1 U2=c2 V0=d0 V1=d1 V2=d2 O_equal=notsamecolor
+.subckt imply I0=notsamecolor I1=notsamenode O=notsamecolornode
+.subckt and2 I0=diffcolor I1=conehotdonehot O=temp1
+.subckt and2 I0=notsamecolornode I1=temp1 O=f
+.end
+
+.model graph
+.inputs U0 U1 U2 U3 U4 U5 U6 U7 U8 U9 U10 U11 U12 U13 U14 U15 V0 V1 V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14 V15 
+.outputs E
+.subckt equiv I0=U0 I1=V1 O=equal0
+.subckt equiv I0=U1 I1=V2 O=equal1
+.subckt equiv I0=U2 I1=V3 O=equal2
+.subckt equiv I0=U3 I1=V4 O=equal3
+.subckt equiv I0=U4 I1=V5 O=equal4
+.subckt equiv I0=U5 I1=V6 O=equal5
+.subckt equiv I0=U6 I1=V7 O=equal6
+.subckt equiv I0=U7 I1=V8 O=equal7
+.subckt equiv I0=U8 I1=V9 O=equal8
+.subckt equiv I0=U9 I1=V10 O=equal9
+.subckt equiv I0=U10 I1=V11 O=equal10
+.subckt equiv I0=U11 I1=V12 O=equal11
+.subckt equiv I0=U12 I1=V13 O=equal12
+.subckt equiv I0=U13 I1=V14 O=equal13
+.subckt equiv I0=U14 I1=V15 O=equal14
+.subckt xor2 I0=U15 I1=U16 O=e
+.subckt equiv I0=V0 I1=e O=equal15
+.subckt and16 I0=equal0 I1=equal1 I2=equal2 I3=equal3 I4=equal4 I5=equal5 I6=equal6 I7=equal7 I8=equal8 I9=equal9 I10=equal10 I11=equal11 I12=equal12 I13=equal13 I14=equal14 I15=equal15 O=E
+.end
+
+.model color_not_equal
+.inputs C0 C1 C2 D0 D1 D2 
+.outputs O_nequal
+.subckt xor2 I0=C0 I1=D0 O=unequal0
+.subckt xor2 I0=C1 I1=D1 O=unequal1
+.subckt xor2 I0=C2 I1=D2 O=unequal2
+.subckt or3 I0=unequal0 I1=unequal1 I2=unequal2 O=O_nequal
+.end
+
+.model not
+.inputs I
+.outputs O
+.names I O
+0 1
+.end
+
+.model or2
+.inputs I0 I1 
+.outputs O
+.names I0 I1 O
+1- 1
+-1 1
+.end
+
+.model and2
+.inputs I0 I1 
+.outputs O
+.names I0 I1 O
+11 1
+.end
+
+.model imply
+.inputs I0 I1
+.outputs O
+.names I0 I1 O
+0- 1
+-1 1
+.end
+
+.model equiv
+.inputs I0 I1
+.outputs O
+.names I0 I1 O
+11 1
+00 1
+.end
+
+.model xor2
+.inputs I0 I1
+.outputs O
+.names I0 I1 O
+01 1
+10 1
+.end
+
+.model or16
+.inputs I0 I1 I2 I3 I4 I5 I6 I7 I8 I9 I10 I11 I12 I13 I14 I15 
+.outputs O
+.names I0 I1 I2 I3 I4 I5 I6 I7 I8 I9 I10 I11 I12 I13 I14 I15 O
+1--------------- 1
+-1-------------- 1
+--1------------- 1
+---1------------ 1
+----1----------- 1
+-----1---------- 1
+------1--------- 1
+-------1-------- 1
+--------1------- 1
+---------1------ 1
+----------1----- 1
+-----------1---- 1
+------------1--- 1
+-------------1-- 1
+--------------1- 1
+---------------1 1
+.end
+
+.model and16
+.inputs I0 I1 I2 I3 I4 I5 I6 I7 I8 I9 I10 I11 I12 I13 I14 I15 
+.outputs O
+.names I0 I1 I2 I3 I4 I5 I6 I7 I8 I9 I10 I11 I12 I13 I14 I15 O
+1111111111111111 1
+.end
+
+.model UneqV16
+.inputs U0 U1 U2 U3 U4 U5 U6 U7 U8 U9 U10 U11 U12 U13 U14 U15 V0 V1 V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14 V15 
+.outputs O_equal
+.subckt xor2 I0=U0 I1=V0 O=unequal0
+.subckt xor2 I0=U1 I1=V1 O=unequal1
+.subckt xor2 I0=U2 I1=V2 O=unequal2
+.subckt xor2 I0=U3 I1=V3 O=unequal3
+.subckt xor2 I0=U4 I1=V4 O=unequal4
+.subckt xor2 I0=U5 I1=V5 O=unequal5
+.subckt xor2 I0=U6 I1=V6 O=unequal6
+.subckt xor2 I0=U7 I1=V7 O=unequal7
+.subckt xor2 I0=U8 I1=V8 O=unequal8
+.subckt xor2 I0=U9 I1=V9 O=unequal9
+.subckt xor2 I0=U10 I1=V10 O=unequal10
+.subckt xor2 I0=U11 I1=V11 O=unequal11
+.subckt xor2 I0=U12 I1=V12 O=unequal12
+.subckt xor2 I0=U13 I1=V13 O=unequal13
+.subckt xor2 I0=U14 I1=V14 O=unequal14
+.subckt xor2 I0=U15 I1=V15 O=unequal15
+.subckt or16 I0=unequal0 I1=unequal1 I2=unequal2 I3=unequal3 I4=unequal4 I5=unequal5 I6=unequal6 I7=unequal7 I8=unequal8 I9=unequal9 I10=unequal10 I11=unequal11 I12=unequal12 I13=unequal13 I14=unequal14 I15=unequal15 O=O_equal
+.end
+
+.model or3
+.inputs I0 I1 I2 
+.outputs O
+.names I0 I1 I2 O
+1-- 1
+-1- 1
+--1 1
+.end
+
+.model UneqV3
+.inputs U0 U1 U2 V0 V1 V2 
+.outputs O_equal
+.subckt xor2 I0=U0 I1=V0 O=unequal0
+.subckt xor2 I0=U1 I1=V1 O=unequal1
+.subckt xor2 I0=U2 I1=V2 O=unequal2
+.subckt or3 I0=unequal0 I1=unequal1 I2=unequal2 O=O_equal
+.end
+
+.model onehot3
+.inputs I0 I1 I2 
+.outputs O
+.names I0 I1 I2 O
+100 1
+010 1
+001 1
+.end
+

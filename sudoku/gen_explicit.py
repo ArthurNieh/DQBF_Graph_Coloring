@@ -8,7 +8,7 @@ from sudoku_gen import Sudoku
 output_file = "./explicit/sudoku_graph.txt"
 sample_file = "./sample/sudoku.txt"
 
-n = 3 # Size of subgrid: n x n
+n = 6 # Size of subgrid: n x n
 N = n*n # Size of Sudoku: N x N
 remove_ratio = 0.3 # Ratio of digits to be removed
 wrong_digit_num = 3 # Number of wrong digits to be added
@@ -95,6 +95,7 @@ def add_wrong_edge(num):
             j = random.randint(0, N-1)
         node = (i+1)*N+j
         # if (color, node) not in E:
+        Sudoku_game[i][j] = str(color+1)
         print(str(node) + " in color " + str(color))
         for k in range(N):
             if k != color:
