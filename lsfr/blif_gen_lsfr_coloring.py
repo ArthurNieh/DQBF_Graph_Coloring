@@ -13,13 +13,13 @@ import math
 output_file = "./sample/lsfr.blif"
 
 blif_lines = []
-N = 16
+N = 4
 colorability = 3    # 2-colorable for even cycle, 3-colorable for odd cycle
 u_num = v_num = N
 c_num = d_num = colorability
 
 # xor_gates = [11, 13, 14, 16]
-xor_gates = [15, 16]
+xor_gates = [2, 4]
 
 def add_main_model():
 
@@ -52,7 +52,21 @@ def add_main_model():
         blif_lines.append("V" + str(i) + "=u" + str(i) + " ")
     blif_lines.append("E=e2\n")
 
-    blif_lines.append(".subckt or2 I0=e1 I1=e2 O=e\n")
+    # graph = 0, if u = 0000...0, v = 0000...0
+    # blif_lines.append(f".subckt or{u_num} ")
+    # for i in range(u_num):
+    #     blif_lines.append(f"I{i}=u{i} ")
+    # blif_lines.append("O=e0\n")
+
+    blif_lines.append(".subckt or2 I0=e1 I1=e2 O=e0\n")
+
+    blif_lines.append(f".subckt UneqV{u_num} ")
+    for i in range(u_num):
+        blif_lines.append(f"U{i}=u{i} ")
+    for i in range(v_num):
+        blif_lines.append(f"V{i}=v{i} ")
+    blif_lines.append("O_equal=notsame\n")
+    blif_lines.append(".subckt and2 I0=e0 I1=notsame O=e\n")
 
 ### Color subcircuit
     blif_lines.append(".subckt color_not_equal ")
@@ -115,7 +129,7 @@ def add_implicit_graph():
         blif_lines.append(".subckt equiv I0=U" + str(i) + " I1=V" + str(i+1) + " O=equal" + str(i) + "\n")
     blif_lines.append(f".subckt xor{len(xor_gates)} ")
     for i in range(len(xor_gates)):
-        blif_lines.append(f"I{i}=U{xor_gates[i]} ")
+        blif_lines.append(f"I{i}=U{xor_gates[i]-1} ")
     blif_lines.append("O=e\n")
     blif_lines.append(f".subckt equiv I0=V0 I1=e O=equal{u_num-1}\n")
     blif_lines.append(f".subckt and{u_num} ")
