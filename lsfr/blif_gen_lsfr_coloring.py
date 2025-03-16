@@ -317,7 +317,7 @@ def add_onehot(num):
     return
 
 def add_subcircuit_model():
-    add_not_gate()
+    # add_not_gate()
     add_or_num(2)
     add_and_num(2)
     # add_xor_2()         #
@@ -346,3 +346,4 @@ if __name__ == "__main__":
     add_subcircuit_model()
     with open(output_file, "w") as f:
         f.writelines(blif_lines)
+    print("\nGenerate blif file successfully!\n")
