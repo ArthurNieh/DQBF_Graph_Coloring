@@ -7,19 +7,19 @@
 # Date: 2025-03-10
 # Reference: https://www.notion.so/DQBF-on-Graphs-1ac570d5afa980eca2deef656ebd8b68?pvs=4
 
-
+from config import *
 import math
 
 output_file = "./sample/lsfr.blif"
 
 blif_lines = []
-N = 4
-colorability = 3    # 2-colorable for even cycle, 3-colorable for odd cycle
+# N = 4
+# colorability = 3    # 2-colorable for even cycle, 3-colorable for odd cycle
 u_num = v_num = N
 c_num = d_num = colorability
 
 # xor_gates = [11, 13, 14, 16]
-xor_gates = [2, 4]
+# xor_gates = [2, 4]
 
 def add_main_model():
 

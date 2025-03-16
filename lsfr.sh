@@ -9,7 +9,7 @@ cd /home/arthur/course/sat/DQBF_Graph_Coloring/lsfr
 # python3 gen_explicit.py
 
 # Generate the blif file
-python3 blif_gen_lsfr.py 
+python3 blif_gen_lsfr_coloring.py 
 # this will generate lsfr.blif
 
 # Run the POPSAT solver
