@@ -23,14 +23,19 @@ c_digits = math.ceil(math.log2(colorability))
 u_num = v_num = 0
 c_num = d_num = c_digits
 
-FF_DQ_map = dict()
+FF_D_map = dict()
+FF_Q_map = dict()
 FF_ind_map = dict()
 
 PI_num = 0
 PI_dict = dict()
 
 def parse_bench():
-    global N, u_num, v_num, c_num, d_num
+    global N, u_num, v_num, c_num, d_num, PI_num
+    global FF_D_map, FF_Q_map, FF_ind_map
+    global PI_dict
+    global input_file, output_file, abc_file
+
     print(f"Reading file: {abc_file}")
     with open(abc_file, "r") as f:
         lines = f.readlines()
@@ -45,8 +50,8 @@ def parse_bench():
             for i in range(PI_num):
                 pi = line[4+i].strip('\n').split('=')[1]
                 PI_dict.update({i: pi})
-                print(f"PI_dict: {i} -> {pi}")
-            print(f"Number of inputs: {PI_num}")
+                # print(f"PI_dict: {i} -> {pi}")
+            print(f"Number of inputs: {PI_num}\n")
 
         elif line[0] == "Latches":
 
@@ -56,17 +61,24 @@ def parse_bench():
             
             for i in range(N):
                 ff = line[4+i].replace('(','=').replace(')','=').split('=')
-                print(f"FF_DQ_map: {ff[1]} -> {ff[2]}")
-                FF_DQ_map.update({ff[1]: ff[2]})
-                print(f"FF_ind_map: {ff[1]} -> {i}")
-                print(f"FF_ind_map: {ff[2]} -> {i}")
+                
+                FF_Q_map.update({i: ff[1]})
+                FF_D_map.update({i: ff[2]})
+                # print(f"FF_D_map: {i} -> {FF_D_map[i]}")
+                # print(f"FF_Q_map: {i} -> {FF_Q_map[i]}")
                 FF_ind_map.update({ff[1]: i})
                 FF_ind_map.update({ff[2]: i})
+                # print(f"FF_ind_map: {ff[1]} -> {FF_ind_map[ff[1]]}")
+                # print(f"FF_ind_map: {ff[2]} -> {FF_ind_map[ff[2]]}")
             break
 
     return
 
 def add_main_model():
+    global u_num, v_num, c_num, d_num
+    global FF_D_map, FF_Q_map, FF_ind_map
+    global PI_num, PI_dict
+    global blif_lines
 
 ### I/O parameters
     blif_lines.append(f".model {iscas_case}\n")
@@ -79,6 +91,8 @@ def add_main_model():
         blif_lines.append("c" + str(i) + " ")
     for i in range(d_num):
         blif_lines.append("d" + str(i) + " ")
+    for i in range(PI_num):
+        blif_lines.append("pi" + str(i) + " ")
     blif_lines.append("\n")
     blif_lines.append(".outputs f\n")
 
@@ -88,6 +102,8 @@ def add_main_model():
         blif_lines.append("U" + str(i) + "=u" + str(i) + " ")
     for i in range(v_num):
         blif_lines.append("V" + str(i) + "=v" + str(i) + " ")
+    for i in range(PI_num):
+        blif_lines.append("I" + str(i) + "=pi" + str(i) + " ")
     blif_lines.append("E=e1\n")
 
     blif_lines.append(".subckt graph ")
@@ -95,6 +111,8 @@ def add_main_model():
         blif_lines.append("U" + str(i) + "=v" + str(i) + " ")
     for i in range(v_num):
         blif_lines.append("V" + str(i) + "=u" + str(i) + " ")
+    for i in range(PI_num):
+        blif_lines.append("I" + str(i) + "=pi" + str(i) + " ")
     blif_lines.append("E=e2\n")
 
     # graph = 0, if u = 0000...0, v = 0000...0
@@ -161,26 +179,51 @@ def add_main_model():
     blif_lines.append(".end\n\n")
 
 def add_implicit_graph():
-    blif_lines.append(".model graph\n")
+    global u_num, v_num, PI_num, PI_dict
+    
+    # put the original blif file into the new blif file
+    with open(input_file, "r") as f:
+        lines = f.readlines()
+    model_name = ''
+    for line in lines:
+        if model_name == '':
+            s = line.split(' ')
+            if s[0] == '.model':
+                model_name = 'D_Q'
+                blif_lines.append(f'.model {model_name}\n')
+            # print(f"%%%{model_name}%%%")
+            continue
+        blif_lines.append(line)
+    
+    blif_lines.append("\n.model graph\n")
     blif_lines.append(".inputs ")
     for i in range(u_num):
         blif_lines.append("U" + str(i) + " ")
     for i in range(v_num):
         blif_lines.append("V" + str(i) + " ")
+    for i in range(PI_num):
+        blif_lines.append("I" + str(i) + " ")
     blif_lines.append("\n")
     blif_lines.append(".outputs E\n")
     
-    for i in range(u_num-1):
-        blif_lines.append(".subckt equiv I0=U" + str(i) + " I1=V" + str(i+1) + " O=equal" + str(i) + "\n")
-    blif_lines.append(f".subckt xor{len(xor_gates)} ")
-    for i in range(len(xor_gates)):
-        blif_lines.append(f"I{i}=U{xor_gates[i]-1} ")
-    blif_lines.append("O=e\n")
-    blif_lines.append(f".subckt equiv I0=V0 I1=e O=equal{u_num-1}\n")
+    blif_lines.append(f".subckt {model_name} ")
+    for i in range(PI_num):
+        blif_lines.append(f"{PI_dict[i]}=I{i} ")
+    for i in range(u_num):
+        blif_lines.append(f"{FF_Q_map[i]}=U{i} ")
+    for i in range(v_num):
+        blif_lines.append(f"{FF_D_map[i]}=s{i} ")
+    # TODO PO wire not yet assign
+    blif_lines.append("\n")
+
+    for i in range(u_num):
+        blif_lines.append(f".subckt equiv I0=V{i} I1=s{i} O=E{i}\n")
+
     blif_lines.append(f".subckt and{u_num} ")
     for i in range(u_num):
-        blif_lines.append(f"I{i}=equal{i} ")
+        blif_lines.append(f"I{i}=E{i} ")
     blif_lines.append("O=E\n")
+
     blif_lines.append(".end\n\n")
     return
 
@@ -423,9 +466,7 @@ def add_subcircuit_model():
     # add_not_gate()
     add_or_num(2)
     add_and_num(2)
-    # add_xor_2()         #
-    if len(xor_gates) > 2:
-        add_xor_num(len(xor_gates))#
+    # add_xor_2()       #
     add_imply_gate()    #
     add_equiv_gate()    #
     add_nequiv_gate()   # xor2
@@ -448,14 +489,14 @@ if __name__ == "__main__":
 
 
 
-    # add_main_model()
-    # add_implicit_graph()
-    # add_color_not_equal()
-    add_n_comparator(c_num)
-    add_or_num(2)
+    add_main_model()
+    add_implicit_graph()
+    add_color_not_equal()
+    # add_n_comparator(c_num)
+    # add_or_num(2)
     # add_or_num(3)
-    add_fit_color_limit(colorability)
-    # add_subcircuit_model()
+    # add_fit_color_limit(colorability)
+    add_subcircuit_model()
     with open(output_file, "w") as f:
         f.writelines(blif_lines)
     print("\nGenerate blif file successfully!\n")
