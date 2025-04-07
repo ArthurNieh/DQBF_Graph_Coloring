@@ -17,8 +17,9 @@ abc_file = f"./abc_output.txt"
 
 blif_lines = []
 N = 0
-colorability = 4
-c_digits = math.ceil(math.log2(colorability))
+colorability = 5
+# c_digits = math.ceil(math.log2(colorability))
+c_digits = colorability
 
 u_num = v_num = 0
 c_num = d_num = c_digits
