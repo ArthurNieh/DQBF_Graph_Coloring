@@ -1,0 +1,23 @@
+# Benchmark "/home/arthur/course/sat/DQBF_Graph_Coloring/iscas89/benchmarks/s27" written by ABC on Mon Apr  7 17:27:06 2025
+.model /home/arthur/course/sat/DQBF_Graph_Coloring/iscas89/benchmarks/s27
+.inputs G0 G1 G2 G3 G5 G6 G7
+.outputs G17 n12 n17 n22
+.names G0 G6 new_n12_1
+01 1
+.names G3 new_n12_1 new_n13
+00 1
+.names G1 G7 new_n14
+00 1
+.names new_n12_1 new_n14 new_n15
+00 1
+.names new_n13 new_n15 new_n16
+00 1
+.names G5 new_n16 n17
+01 1
+.names G0 n17 n12
+10 1
+.names G2 new_n14 n22
+00 1
+.names n17 G17
+0 1
+.end
