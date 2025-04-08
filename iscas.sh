@@ -1,19 +1,20 @@
 #!/bin/bash
 # Auto Generate iscas.blif and run the DQBF solver
 # Author: Arthur Nieh
-# Date: 2025/3/31
+# Date: 2025/4/7
 # Usage: ./iscas.sh
 
 instance=$1
 
-# Generate the lsfr
+# Generate the blif file of the iscas89 benchmark
 cd /home/arthur/course/sat/DQBF_Graph_Coloring/iscas89/
+g++ -o gen_testcase gen_testcase.cpp
 python3 bench_to_blif.py "$instance"
 
 start1=`date +%s.%N`
 python3 explicit_gen_iscas.py "$instance"
 # this will generate iscas_graph.txt
-
+end_p=`date +%s.%N`
 # Run the POPSAT solver
 # echo "######################################################"
 echo -e "\nRun the POPSAT solver"
@@ -45,5 +46,7 @@ end2=`date +%s.%N`
 
 runtime1=$( echo "$end1 - $start1" | bc -l )
 echo -e "\nRuntime for SAT was $runtime1 seconds.\n"
+runtime_p=$( echo "$end_p - $start1" | bc -l )
+echo -e "\nRuntime for explicit_gen_iscas.py was $runtime_p seconds.\n"
 runtime2=$( echo "$end2 - $start2" | bc -l )
 echo -e "\nRuntime for DQBF was $runtime2 seconds.\n"
