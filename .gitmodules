@@ -4,3 +4,6 @@
 [submodule "popsatgcpbcp"]
 	path = popsatgcpbcp
 	url = git@github.com:s6dafabe/popsatgcpbcp.git
+[submodule "abc"]
+	path = abc
+	url = git@github.com:ArthurNieh/abc.git
