@@ -5,9 +5,18 @@
 # Usage: ./iscas.sh
 
 instance=$1
+colorability=$2
+if [ -z "$instance" ]; then
+    echo "Usage: $0 <iscas89_instance> <colorability>"
+    exit 1
+fi
+if [ -z "$colorability" ]; then
+    echo "Usage: $0 <iscas89_instance> <colorability>"
+    exit 1
+fi
 
 # Generate the blif file of the iscas89 benchmark
-cd /home/arthur/course/sat/DQBF_Graph_Coloring/iscas89/
+cd ./iscas89/
 g++ -o gen_testcase gen_testcase.cpp
 python3 bench_to_blif.py "$instance"
 
@@ -18,7 +27,7 @@ end_p=`date +%s.%N`
 # Run the POPSAT solver
 # echo "######################################################"
 echo -e "\nRun the POPSAT solver"
-cd /home/arthur/course/sat/DQBF_Graph_Coloring/popsatgcpbcp/source
+cd ../popsatgcpbcp/source
 python3 main.py --instance=../../iscas89/sample/iscas_graph.txt --model=POP-S
 
 end1=`date +%s.%N`
@@ -26,8 +35,8 @@ end1=`date +%s.%N`
 echo "######################################################"
 start2=`date +%s.%N`
 # Generate the blif file
-cd /home/arthur/course/sat/DQBF_Graph_Coloring/iscas89
-python3 blif_gen_iscas_coloring.py "$instance"
+cd ../../iscas89
+python3 blif_gen_iscas_coloring.py "$instance" "$colorability"
 # this will generate lsfr.blif
 
 # Generate DQDIMACS for the DQBF solver
@@ -35,12 +44,12 @@ python3 blif_gen_iscas_coloring.py "$instance"
 echo "Generate DQDIMACS file"
     ## this part is written at /home/arthur/program/abc/dqbf
     ## the abc have been modified to support DQBF
-cd /home/arthur/program/abc/dqbf
-python3 convert_to_cnf.py "/home/arthur/course/sat/DQBF_Graph_Coloring/iscas89/sample/${instance}_color.blif"
+cd ../abc/dqbf
+python3 convert_to_cnf.py "../../iscas89/sample/${instance}_color.blif"
 
 # Run the DQBF solver
-cd /home/arthur/course/sat/DQBF_Graph_Coloring/pedant-solver/build/src
-./pedant /home/arthur/program/abc/dqbf/dqdimacs.txt --cnf model
+cd ../../pedant-solver/build/src
+./pedant ../../../abc/dqbf/dqdimacs.txt --cnf model
 
 end2=`date +%s.%N`
 

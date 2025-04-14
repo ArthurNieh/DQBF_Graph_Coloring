@@ -5,9 +5,10 @@ import os
 from subprocess import check_output
 import sys
 
-abc_dir = '/home/arthur/program/abc/'
+# working directory Dqbf_Graph_Coloring/iscas89
+abc_dir = '../abc/'
 abc_output = 'abc_output.txt'
-iscas_bench_dir = '/home/arthur/course/sat/DQBF_Graph_Coloring/iscas89/benchmarks/'
+iscas_bench_dir = './benchmarks/'
 
 def gen_parse_bench_script(input_file):
     print('[log] Generating parse_bench.sh...')
@@ -32,7 +33,7 @@ def convert_to_blif(input_file):
     with open(abc_output, 'w') as f:
         f.write(out.decode('utf-8'))
     
-    os.system(f'rm {iscas_bench_dir}parse_bench.sh')
+    # os.system(f'rm {iscas_bench_dir}parse_bench.sh')
     return
 
 if __name__ == '__main__':

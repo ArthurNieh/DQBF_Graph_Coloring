@@ -8,9 +8,9 @@ import os
 from itertools import product
 import time
 
-iscas_dir = '/home/arthur/course/sat/DQBF_Graph_Coloring/iscas89/'
-sample_dir = '/home/arthur/course/sat/DQBF_Graph_Coloring/iscas89/sample/'
-bench_dir = '/home/arthur/course/sat/DQBF_Graph_Coloring/iscas89/benchmarks/'
+iscas_dir = './'
+sample_dir = './sample/'
+bench_dir = './benchmarks/'
 output_file = "iscas_graph.txt"
 test_case_file = "test_cases.txt"
 abc_script = "abc_script.sh"
@@ -66,24 +66,24 @@ def generate_test_cases():
         #     "".join(map(str, test_case)) + "\n"
         #     for test_case in product([0, 1], repeat=input_num + FF_num)
         # )
-    os.system(f"cd {iscas_dir} && ./gen_testcase {input_num+FF_num}") 
+    os.system(f"./gen_testcase {input_num+FF_num}") 
     return
 
 def gen_abc_script(ins):
 
     with open(sample_dir + abc_script, "w") as f:
-        f.write(f"read {bench_dir}{ins}.blif\n")
+        f.write(f"read ../iscas89/benchmarks/{ins}.blif\n")
         f.write("strash\n")
         f.write("time\n")
-        f.write("sim -A " + sample_dir + test_case_file + " -v \n")
+        f.write("sim -A ../iscas89/sample/" + test_case_file + " -v \n")
         f.write("time\n")
         f.write("quit\n")
     return
 
 def exec_abc():
-    os.system('cd /home/arthur/course/sat/DQBF_Graph_Coloring/')
+    # os.system('cd /home/arthur/course/sat/DQBF_Graph_Coloring/')
 
-    out = check_output(['/home/arthur/program/abc/abc', '-f', f'{sample_dir}{abc_script}'])
+    out = check_output(['../abc/abc', '-f', f'{sample_dir}{abc_script}'])
     # out = check_output(['/home/arthur/program/abc/abc', '-f', '/home/arthur/course/sat/DQBF_Graph_Coloring/iscas89/sample/abc_script.sh'])
     # print(out.decode('utf-8'))
     decoded = out.decode('utf-8')
