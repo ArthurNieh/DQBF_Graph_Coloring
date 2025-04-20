@@ -31,6 +31,7 @@ FF_ind_map = dict()
 
 PI_num = 0
 PI_dict = dict()
+PO_list = []
 
 def parse_bench():
     global N, u_num, v_num, c_num, d_num, PI_num
@@ -54,6 +55,14 @@ def parse_bench():
                 PI_dict.update({i: pi})
                 # print(f"PI_dict: {i} -> {pi}")
             print(f"Number of inputs: {PI_num}")
+
+        elif line[1] == "outputs":
+            PO_num = int(line[2].strip("():"))
+            for i in range(PO_num):
+                po = line[3+i].strip('\n').split('=')[1]
+                PO_list.append(po)
+                # print(f"PO_list {i}: {po}")
+            print(f"Number of outputs: {PO_num}")
 
         elif line[0] == "Latches":
 
@@ -213,6 +222,8 @@ def add_implicit_graph():
         blif_lines.append(f"{PI_dict[i]}=I{i} ")
     for i in range(u_num):
         blif_lines.append(f"{FF_Q_map[i]}=U{i} ")
+    for po in PO_list:
+        blif_lines.append(f"{po}={po} ")
     for i in range(v_num):
         blif_lines.append(f"{FF_D_map[i]}=s{i} ")
     # TODO PO wire not yet assign
