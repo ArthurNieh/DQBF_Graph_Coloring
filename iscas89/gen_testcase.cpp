@@ -25,11 +25,12 @@ int main(int argc, char *argv[])
     // generate a binary test case with the specified bit number
     // from 0 to 2^bit_number - 1
     std::string binary(bit_number, '0');
-    for (int i = 0; i < (1 << bit_number); ++i)
+    uint64_t limit = 1ULL << bit_number;
+    for (uint64_t i = 0; i < limit; ++i)
     {
-        for (int j = bit_number - 1, val = i; j >= 0; --j, val >>= 1)
+        for (int j = bit_number - 1; j >= 0; --j)
         {
-            binary[j] = (val & 1) ? '1' : '0';
+            binary[j] = ((i >> (bit_number - 1 - j)) & 1) ? '1' : '0';
         }
         output << binary << '\n';
     }
