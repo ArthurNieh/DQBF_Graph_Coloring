@@ -6,6 +6,7 @@
 
 instance=$1
 colorability=$2
+timelimit=$((3 * 60 * 60))
 if [ -z "$instance" ]; then
     echo "Usage: $0 <iscas89_instance> <colorability>"
     exit 1
@@ -28,7 +29,7 @@ end_p=`date +%s.%N`
 # echo "######################################################"
 echo -e "\nRun the POPSAT solver"
 cd ../popsatgcpbcp/source
-python3 main.py --instance=../../iscas89/sample/iscas_graph.txt --model=POP-S
+python3 main.py "--instance=../../iscas89/sample/iscas_graph.txt" "--model=POP-S" "--timelimit=$timelimit"
 
 end1=`date +%s.%N`
 
