@@ -10,20 +10,19 @@
 import sys
 import math
 
-# two parameters
-iscas_case = sys.argv[1]
-colorability = sys.argv[2]
+# three parameters
+iscas_case = ''
+colorability = ''
+binary_color = ''
 
-input_file = f"./benchmarks/{iscas_case}.blif"
-output_file = f"./sample/{iscas_case}_color.blif"
 abc_file = f"./abc_output.txt"
 
 blif_lines = []
-N = 0
-c_digits = int(colorability)
+FF_num = 0
 
 u_num = v_num = 0
-c_num = d_num = c_digits
+c_num = d_num = 0
+c_digits = 0
 
 FF_D_map = dict()
 FF_Q_map = dict()
@@ -34,7 +33,7 @@ PI_dict = dict()
 PO_list = []
 
 def parse_bench():
-    global N, u_num, v_num, c_num, d_num, PI_num
+    global FF_num, u_num, v_num, PI_num
     global FF_D_map, FF_Q_map, FF_ind_map
     global PI_dict
     global abc_file
@@ -66,11 +65,11 @@ def parse_bench():
 
         elif line[0] == "Latches":
 
-            N = int(line[1].strip("():"))
-            u_num = v_num = N
-            print(f"Number of nodes: {N}")
+            FF_num = int(line[1].strip("():"))
+            u_num = v_num = FF_num
+            print(f"Number of nodes: {FF_num}")
             
-            for i in range(N):
+            for i in range(FF_num):
                 ff = line[4+i].replace('(','=').replace(')','=').split('=')
                 
                 FF_Q_map.update({i: ff[1]})
@@ -86,7 +85,7 @@ def parse_bench():
     return
 
 def add_main_model():
-    global u_num, v_num, c_num, d_num
+    global u_num, v_num, c_num, d_num, c_digits, colorability, binary_color
     global FF_D_map, FF_Q_map, FF_ind_map
     global PI_num, PI_dict
     global blif_lines
@@ -151,20 +150,35 @@ def add_main_model():
     blif_lines.append("O_nequal=ncolor\n")
 
 ### Onehot subcircuit
-    blif_lines.append(".subckt onehot" + str(c_num) + " ")
-    for i in range(c_num):
-        blif_lines.append("I" + str(i) + "=c" + str(i) + " ")
-    blif_lines.append("O=conehot\n")
+    if binary_color == '0':
+        blif_lines.append(".subckt onehot" + str(c_num) + " ")
+        for i in range(c_num):
+            blif_lines.append("I" + str(i) + "=c" + str(i) + " ")
+        blif_lines.append("O=conehot\n")
 
-    blif_lines.append(".subckt onehot" + str(d_num) + " ")
-    for i in range(d_num):
-        blif_lines.append("I" + str(i) + "=d" + str(i) + " ")
-    blif_lines.append("O=donehot\n")
+        blif_lines.append(".subckt onehot" + str(d_num) + " ")
+        for i in range(d_num):
+            blif_lines.append("I" + str(i) + "=d" + str(i) + " ")
+        blif_lines.append("O=donehot\n")
+        blif_lines.append(".subckt and2 I0=conehot I1=donehot O=colorencode\n")
+### Binary color subcircuit
+    elif binary_color == '1':
+        blif_lines.append(".subckt fit_color_limit ")
+        for i in range(c_num):
+            blif_lines.append(f"I{i}=c{i} ")
+        blif_lines.append("G=clessthan\n")
+        blif_lines.append(".subckt fit_color_limit ")
+        for i in range(d_num):
+            blif_lines.append(f"I{i}=d{i} ")
+        blif_lines.append("G=dlessthan\n")
+        blif_lines.append(".subckt and2 I0=clessthan I1=dlessthan O=colorencode\n")
+        
+    else:
+        print("Error: binary_color should be 0 or 1")
+        sys.exit(1)
 
 ### Main circuit
     blif_lines.append(".subckt imply I0=e I1=ncolor O=diffcolor\n")
-
-    blif_lines.append(".subckt and2 I0=conehot I1=donehot O=conehotdonehot\n")
 
     # not same node
     blif_lines.append(".subckt UneqV" + str(u_num) + " ")
@@ -184,13 +198,16 @@ def add_main_model():
 
     blif_lines.append(".subckt imply I0=notsamecolor I1=notsamenode O=notsamecolornode\n")
 
-    blif_lines.append(".subckt and2 I0=diffcolor I1=conehotdonehot O=temp1\n")
+    blif_lines.append(".subckt and2 I0=diffcolor I1=colorencode O=temp1\n")
     blif_lines.append(".subckt and2 I0=notsamecolornode I1=temp1 O=f\n")
 
     blif_lines.append(".end\n\n")
 
 def add_implicit_graph():
     global u_num, v_num, PI_num, PI_dict
+    global FF_D_map, FF_Q_map, FF_ind_map
+    global blif_lines
+    global input_file
     
     # put the original blif file into the new blif file
     with open(input_file, "r") as f:
@@ -259,6 +276,9 @@ def add_color_not_equal():
     return
 
 def add_1_comparator():
+    # G = 1 if A > B
+    # C = 1 if A = B
+    # E = 1 if A = B in the significant bit
     blif_lines.append(".model comparator\n")
     blif_lines.append(".inputs A B E\n")
     blif_lines.append(".outputs G C\n")
@@ -270,12 +290,14 @@ def add_1_comparator():
     blif_lines.append(".end\n\n")
 
 def add_fit_color_limit(c_limit):
-    if c_limit <= 0 or c_limit >= math.pow(2, c_num):
+    if c_limit <= 0 or c_limit > math.pow(2, c_num):
         print("Error: c_limit should be greater than 0 and less than c_num")
         sys.exit(1)
-    b_c_limit = bin(c_limit)[2:]
+    b_c_limit = bin(c_limit-1)[2:]
     b_c_limit = b_c_limit.zfill(c_digits)
     print(f"c_limit: {b_c_limit}")
+
+    add_n_comparator(c_num)
 
     blif_lines.append(".model fit_color_limit\n")
     blif_lines.append(".inputs ")
@@ -290,7 +312,7 @@ def add_fit_color_limit(c_limit):
         blif_lines.append(f"{b_c_limit[-i-1]}\n")
         print(f"C{i}={b_c_limit[-i-1]}")
     
-    # compare, if C > I, G = 1
+    # compare, if C >= I, G = 1
     blif_lines.append(f".subckt comparator{c_num} ")
     for i in range(c_num):
         blif_lines.append(f"A{i}=C{i} ")
@@ -303,6 +325,7 @@ def add_fit_color_limit(c_limit):
 def add_n_comparator(num):
     add_1_comparator()
     
+    # G = 1 if A >= B
     blif_lines.append(f".model comparator{num}\n")
     blif_lines.append(".inputs ")
     for i in range(num):
@@ -476,6 +499,9 @@ def add_onehot(num):
     return
 
 def add_subcircuit_model():
+    global u_num, c_num, d_num, c_digits
+    global blif_lines
+    global binary_color, colorability
     # add_not_gate()
     add_or_num(2)
     add_and_num(2)
@@ -492,20 +518,39 @@ def add_subcircuit_model():
         add_UnequivV(c_num)
     # add_and_num(int(u_num/2))
     
-    # add_UxequivVx()
-    add_onehot(c_num)   #
+    if binary_color == '0':
+        add_onehot(c_num)
+    elif binary_color == '1':
+        add_fit_color_limit(colorability)
+
     return
 
 if __name__ == "__main__":
+
+    if len(sys.argv) != 4:
+        print("Usage: python blif_gen_iscas_coloring.py <iscas_case> <colorability> <color_encoding>")
+        print("Example: python blif_gen_iscas_coloring.py s298 3 1")
+        sys.exit(1)
+    iscas_case = sys.argv[1]
+    colorability = int(sys.argv[2])
+    binary_color = sys.argv[3]
+
+    input_file = f"./benchmarks/{iscas_case}.blif"
+    output_file = f"./sample/{iscas_case}_color.blif"
+
+    if binary_color == "1":
+        c_num = d_num = c_digits = math.ceil(math.log2(colorability))
+    elif binary_color == "0":
+        c_num = d_num = c_digits = colorability
+    else:
+        print("Error: color_encoding should be 0 or 1")
+        sys.exit(1)
+
     # parse blif file generated by abc
     parse_bench()
     add_main_model()
     add_implicit_graph()
     add_color_not_equal()
-    # add_n_comparator(c_num)
-    # add_or_num(2)
-    # add_or_num(3)
-    # add_fit_color_limit(colorability)
     add_subcircuit_model()
     print("\nWriting blif file...")
     with open(output_file, "w") as f:

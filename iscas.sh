@@ -37,7 +37,7 @@ echo "######################################################"
 start2=`date +%s.%N`
 # Generate the blif file
 cd ../../iscas89
-python3 blif_gen_iscas_coloring.py "$instance" "$colorability"
+python3 blif_gen_iscas_coloring.py "$instance" "$colorability" "1"
 # this will generate lsfr.blif
 
 # Generate DQDIMACS for the DQBF solver
