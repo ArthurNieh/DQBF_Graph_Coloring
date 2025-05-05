@@ -93,7 +93,7 @@ def exec_abc():
     return decoded
 
 def gen_expicit(out):
-    global E, FF_num
+    global E, FF_num, vflag
 
     for line in out.splitlines():
         if line.startswith('0') or line.startswith('1'):
@@ -101,12 +101,15 @@ def gen_expicit(out):
             if len(spl) == 2:
                 a = int(spl[0][-FF_num:], base=2) + 1
                 b = int(spl[1][-FF_num:], base=2) + 1
-                if a == b:
-                    continue
-                if a > b:
-                    E.append((b, a))
-                else:
+                if vflag == "d":
                     E.append((a, b))
+                else:
+                    if a == b:
+                        continue
+                    if a > b:
+                        E.append((b, a))
+                    else:
+                        E.append((a, b))
                 # duplicate edges will be removed later
         elif line.startswith('elapse'):
             print(line)
@@ -139,10 +142,40 @@ def remove_dup(x):
     # while maintaining the order of elements
   return list(dict.fromkeys(x))
 
+def gen_graph_visual():
+    from graphviz import Graph
+    from graphviz import Digraph
+    global E, instance, vflag
+    
+    if vflag == "v":
+        g = Graph('G', filename='graph.gv')
+    elif vflag == "d":
+        g = Digraph('G', filename='graph.gv')
+    g.attr(rankdir='LR')
+    # g.attr(size='8,5')
+    g.attr('node', shape='circle')
+    g.attr('graph', ranksep='0.1')
+    g.attr('node', style='filled', fillcolor='lightgrey')
+    g.attr('edge', color='black')
+    g.attr('node', fillcolor='lightblue')
+
+    for e in E:
+        g.edge(str(e[0]), str(e[1]), color='black')
+    
+    g.render(filename=instance, format='png', cleanup=True)
+    # g.view()
+
 if __name__ == "__main__":
 
 # print execution time of each function
     instance = sys.argv[1]
+    vflag = ''
+    if len(sys.argv) == 3:
+        vflag = sys.argv[2].strip('-')
+    if vflag == "v" or vflag == "d":
+        print("Verbose mode enabled")
+    else:
+        print("Verbose mode disabled")
     start_time = time.time()
     parse_iscas_file(instance)
     parse_file_time = time.time()
@@ -175,3 +208,6 @@ if __name__ == "__main__":
     print(f"Total time: {dump_time - start_time:.2f} seconds")
     print("\nExplicit Graph is generated successfully\n")
     print_stats()
+
+    if vflag == "v" or vflag == "d":
+        gen_graph_visual()
