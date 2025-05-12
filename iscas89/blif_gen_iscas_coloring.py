@@ -203,10 +203,9 @@ def add_main_model():
 
     blif_lines.append(".end\n\n")
 
-def add_implicit_graph(input_file):
+def add_implicit_graph(blif_lines, input_file):
     global u_num, v_num, PI_num, PI_dict
     global FF_D_map, FF_Q_map, FF_ind_map
-    global blif_lines
     
     # put the original blif file into the new blif file
     with open(input_file, "r") as f:
@@ -256,12 +255,12 @@ def add_implicit_graph(input_file):
     blif_lines.append(".end\n\n")
     return
 
-def add_color_not_equal():
+def add_color_not_equal(blif_lines, c_num):
     blif_lines.append(".model color_not_equal\n")
     blif_lines.append(".inputs ")
     for i in range(c_num):
         blif_lines.append("C" + str(i) + " ")
-    for i in range(d_num):
+    for i in range(c_num):
         blif_lines.append("D" + str(i) + " ")
     blif_lines.append("\n.outputs O_nequal\n")
 
@@ -274,7 +273,7 @@ def add_color_not_equal():
     blif_lines.append(".end\n\n")
     return
 
-def add_1_comparator():
+def add_1_comparator(blif_lines):
     # G = 1 if A > B
     # C = 1 if A = B
     # E = 1 if A = B in the significant bit
@@ -288,15 +287,16 @@ def add_1_comparator():
     blif_lines.append("001 1\n")
     blif_lines.append(".end\n\n")
 
-def add_fit_color_limit(c_limit):
+def add_fit_color_limit(blif_lines, c_limit, c_num):
     if c_limit <= 0 or c_limit > math.pow(2, c_num):
         print("Error: c_limit should be greater than 0 and less than c_num")
+        print(f"c_limit: {c_limit}, c_num: {c_num}")
         sys.exit(1)
     b_c_limit = bin(c_limit-1)[2:]
     b_c_limit = b_c_limit.zfill(c_digits)
     print(f"c_limit: {b_c_limit}")
 
-    add_n_comparator(c_num)
+    add_n_comparator(blif_lines, c_num)
 
     blif_lines.append(".model fit_color_limit\n")
     blif_lines.append(".inputs ")
@@ -321,8 +321,8 @@ def add_fit_color_limit(c_limit):
 
     blif_lines.append(".end\n\n")
 
-def add_n_comparator(num):
-    add_1_comparator()
+def add_n_comparator(blif_lines, num):
+    add_1_comparator(blif_lines)
     
     # G = 1 if A >= B
     blif_lines.append(f".model comparator{num}\n")
@@ -349,7 +349,7 @@ def add_n_comparator(num):
     blif_lines.append(".end\n\n")
 
 ### All fundamental gates
-def add_not_gate():
+def add_not_gate(blif_lines):
     blif_lines.append(".model not\n")
     blif_lines.append(".inputs I\n")
     blif_lines.append(".outputs O\n")
@@ -358,7 +358,7 @@ def add_not_gate():
     blif_lines.append(".end\n\n")
     return
 
-def add_imply_gate():
+def add_imply_gate(blif_lines):
     blif_lines.append(".model imply\n")
     blif_lines.append(".inputs I0 I1\n")
     blif_lines.append(".outputs O\n")
@@ -368,7 +368,7 @@ def add_imply_gate():
     blif_lines.append(".end\n\n")
     return
 
-def add_equiv_gate():
+def add_equiv_gate(blif_lines):
     blif_lines.append(".model equiv\n")
     blif_lines.append(".inputs I0 I1\n")
     blif_lines.append(".outputs O\n")
@@ -378,7 +378,7 @@ def add_equiv_gate():
     blif_lines.append(".end\n\n")
     return
 
-def add_nequiv_gate(): # xor gate
+def add_nequiv_gate(blif_lines): # xor gate
     blif_lines.append(".model xor2\n")
     blif_lines.append(".inputs I0 I1\n")
     blif_lines.append(".outputs O\n")
@@ -388,7 +388,7 @@ def add_nequiv_gate(): # xor gate
     blif_lines.append(".end\n\n")
     return
 
-def add_or_num(num):
+def add_or_num(blif_lines, num):
     blif_lines.append(".model or" + str(num) + "\n")
     blif_lines.append(".inputs ")
     for i in range(num):
@@ -406,7 +406,7 @@ def add_or_num(num):
     blif_lines.append(".end\n\n")
     return
 
-def add_and_num(num):
+def add_and_num(blif_lines, num):
     # num = int(u_num/2)
     blif_lines.append(".model and" + str(num) + "\n")
     blif_lines.append(".inputs ")
@@ -422,23 +422,23 @@ def add_and_num(num):
     blif_lines.append(".end\n\n")
     return
 
-def add_xor_num(num):
-    if num <= 2:
-        print("Error: num should be greater than 2 for xor_num")
-        return
-    blif_lines.append(".model xor" + str(num) + "\n")
-    blif_lines.append(".inputs ")
-    for i in range(num):
-        blif_lines.append("I" + str(i) + " ")
-    blif_lines.append("\n.outputs O\n")
-    blif_lines.append(".subckt xor2 I0=I0 I1=I1 O=t1\n")
-    for i in range(2, num-1):
-        blif_lines.append(f".subckt xor2 I0=I{i} I1=t{i-1} O=t{i}\n")
-    blif_lines.append(f".subckt xor2 I0=I{num-1} I1=t{num-2} O=O\n")
-    blif_lines.append(".end\n\n")
-    return
+# def add_xor_num(blif_lines, num):
+#     if num <= 2:
+#         print("Error: num should be greater than 2 for xor_num")
+#         return
+#     blif_lines.append(".model xor" + str(num) + "\n")
+#     blif_lines.append(".inputs ")
+#     for i in range(num):
+#         blif_lines.append("I" + str(i) + " ")
+#     blif_lines.append("\n.outputs O\n")
+#     blif_lines.append(".subckt xor2 I0=I0 I1=I1 O=t1\n")
+#     for i in range(2, num-1):
+#         blif_lines.append(f".subckt xor2 I0=I{i} I1=t{i-1} O=t{i}\n")
+#     blif_lines.append(f".subckt xor2 I0=I{num-1} I1=t{num-2} O=O\n")
+#     blif_lines.append(".end\n\n")
+#     return
 
-def add_UnequivV(num):
+def add_UnequivV(blif_lines, num):
     # vector U and V are not equivalent
     blif_lines.append(".model UneqV" + str(num) + "\n")
     blif_lines.append(".inputs ")
@@ -458,7 +458,7 @@ def add_UnequivV(num):
     blif_lines.append(".end\n\n")
     return
 
-def add_UxequivVx():
+def add_UxequivVx(blif_lines):
     # vector Ux and Vx are equivalent
     num = int(u_num/2)
     blif_lines.append(".model UxequVx\n")
@@ -479,7 +479,7 @@ def add_UxequivVx():
     blif_lines.append(".end\n\n")
     return
 
-def add_onehot(num):
+def add_onehot(blif_lines, num):
     blif_lines.append(".model onehot" + str(num) + "\n")
     blif_lines.append(".inputs ")
     for i in range(num):
@@ -502,25 +502,25 @@ def add_subcircuit_model():
     global blif_lines
     global binary_color, colorability
     # add_not_gate()
-    add_or_num(2)
-    add_and_num(2)
+    add_or_num(blif_lines, 2)
+    add_and_num(blif_lines, 2)
     # add_xor_2()       #
-    add_imply_gate()    #
-    add_equiv_gate()    #
-    add_nequiv_gate()   # xor2
-    add_or_num(u_num)   #
-    add_and_num(u_num)  #
-    add_UnequivV(u_num) #
+    add_imply_gate(blif_lines)    #
+    add_equiv_gate(blif_lines)    #
+    add_nequiv_gate(blif_lines)   # xor2
+    add_or_num(blif_lines, u_num)   #
+    add_and_num(blif_lines, u_num)  #
+    add_UnequivV(blif_lines, u_num) #
     if u_num != c_num: 
         if c_num != 2:
-            add_or_num(c_num)
-        add_UnequivV(c_num)
+            add_or_num(blif_lines, c_num)
+        add_UnequivV(blif_lines, c_num)
     # add_and_num(int(u_num/2))
     
     if binary_color == '0':
-        add_onehot(c_num)
+        add_onehot(blif_lines, c_num)
     elif binary_color == '1':
-        add_fit_color_limit(colorability)
+        add_fit_color_limit(blif_lines, colorability, c_num)
 
     return
 
@@ -548,8 +548,8 @@ if __name__ == "__main__":
     # parse blif file generated by abc
     parse_bench()
     add_main_model()
-    add_implicit_graph(input_file)
-    add_color_not_equal()
+    add_implicit_graph(blif_lines, input_file)
+    add_color_not_equal(blif_lines, c_num)
     add_subcircuit_model()
     print("\nWriting blif file...")
     with open(output_file, "w") as f:
