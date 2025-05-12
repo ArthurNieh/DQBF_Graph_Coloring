@@ -7,3 +7,6 @@
 [submodule "abc"]
 	path = abc
 	url = git@github.com:ArthurNieh/abc.git
+[submodule "DQBDD"]
+	path = DQBDD
+	url = https://github.com/Enfest/DQBDD.git
