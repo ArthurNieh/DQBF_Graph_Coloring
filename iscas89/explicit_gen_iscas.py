@@ -162,7 +162,10 @@ def gen_graph_visual():
     for e in E:
         g.edge(str(e[0]), str(e[1]), color='black')
     
-    g.render(filename=instance, format='png', cleanup=True)
+    if vflag == "v":
+        g.render(filename=f"{instance}_u", format='png', cleanup=True)
+    elif vflag == "d":
+        g.render(filename=f"{instance}_d", format='png', cleanup=True)
     # g.view()
 
 if __name__ == "__main__":
