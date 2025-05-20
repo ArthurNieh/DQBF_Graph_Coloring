@@ -1,4 +1,4 @@
-from graphviz import Graph
+# from graphviz import Graph
 from collections import defaultdict
 import itertools
 
@@ -9,15 +9,15 @@ def gen_line_graph(edges):
     original_edges = [(str(u), str(v)) for u, v in edges]
 
     # Step 1: Create original graph for visualization (optional)
-    original_graph = Graph('Original')
-    nodes = set(itertools.chain.from_iterable(original_edges))
-    for node in nodes:
-        original_graph.node(node)
-    for u, v in original_edges:
-        original_graph.edge(u, v)
+    # original_graph = Graph('Original')
+    # nodes = set(itertools.chain.from_iterable(original_edges))
+    # for node in nodes:
+    #     original_graph.node(node)
+    # for u, v in original_edges:
+    #     original_graph.edge(u, v)
 
     # original_graph.render('original_graph', view=True)
-    original_graph.render(filename="original_graph", format='png', cleanup=True)
+    # original_graph.render(filename="original_graph", format='png', cleanup=True)
 
     # Step 2: Build line graph structure
     # Map edge to a node name in the line graph
