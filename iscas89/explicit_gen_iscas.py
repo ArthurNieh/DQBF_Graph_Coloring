@@ -8,6 +8,8 @@ import os
 from itertools import product
 import time
 
+from edge_coloring_explicit import gen_line_graph
+
 iscas_dir = './'
 sample_dir = './sample/'
 bench_dir = './benchmarks/'
@@ -177,6 +179,8 @@ if __name__ == "__main__":
         vflag = sys.argv[2].strip('-')
     if vflag == "v" or vflag == "d":
         print("Verbose mode enabled")
+    elif vflag == "e":
+        print("Edge mode enabled")
     else:
         print("Verbose mode disabled")
     start_time = time.time()
@@ -205,6 +209,10 @@ if __name__ == "__main__":
     print(f"Remove duplicate time: {remove_dup_time - gen_explicit_time:.2f} seconds")
     # E.sort(key = lambda x: (x[0], x[1])) # Sort the edges
     # print_graph()
+
+    if vflag == "e":
+        E = gen_line_graph(E)
+
     dump_graph()
     dump_time = time.time()
     print(f"Dump graph time: {dump_time - remove_dup_time:.2f} seconds")

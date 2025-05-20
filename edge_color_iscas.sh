@@ -6,6 +6,7 @@
 
 instance=$1
 color=$2
+timelimit=$((3 * 60 * 60))
 if [ -z "$instance" ]; then
     echo "Usage: $0 <iscas89_instance> <color>"
     exit 1
@@ -17,10 +18,23 @@ fi
 
 # Generate the blif file of the iscas89 benchmark
 cd ./iscas89/
-# g++ -o gen_testcase gen_testcase.cpp
+g++ -o gen_testcase gen_testcase.cpp
 python3 bench_to_blif.py "$instance"
 
+start1=`date +%s.%N`
+python3 explicit_gen_iscas.py "$instance" "-e"
+# this will generate iscas_graph.txt
+end_p=`date +%s.%N`
+# Run the POPSAT solver
+# echo "######################################################"
+echo -e "\nRun the POPSAT solver"
+cd ../popsatgcpbcp/source
+python3 main.py "--instance=../../iscas89/sample/iscas_graph.txt" "--model=POP-S" "--timelimit=$timelimit"
+
+end1=`date +%s.%N`
+
 echo "######################################################"
+cd ../../iscas89
 start2=`date +%s.%N`
 # Generate the blif file
 python3 blif_gen_iscas_edge.py "$instance" "$color"
@@ -40,5 +54,10 @@ cd ../../pedant-solver/build/src
 
 end2=`date +%s.%N`
 
+echo "######################################################"
+runtime1=$( echo "$end1 - $start1" | bc -l )
+echo -e "\nRuntime for SAT was $runtime1 seconds.\n"
+runtime_p=$( echo "$end_p - $start1" | bc -l )
+echo -e "\nRuntime for explicit_gen_iscas.py was $runtime_p seconds.\n"
 runtime2=$( echo "$end2 - $start2" | bc -l )
 echo -e "\nRuntime for DQBF was $runtime2 seconds.\n"
