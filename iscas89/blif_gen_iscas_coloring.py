@@ -322,7 +322,10 @@ def add_fit_color_limit(blif_lines, c_limit, c_num):
     blif_lines.append(".end\n\n")
 
 def add_n_comparator(blif_lines, num):
-    add_1_comparator(blif_lines)
+    if ".model comparator\n" not in blif_lines:
+        add_1_comparator(blif_lines)
+    if f".model comparator{num}\n" in blif_lines:
+        return
     
     # G = 1 if A >= B
     blif_lines.append(f".model comparator{num}\n")
