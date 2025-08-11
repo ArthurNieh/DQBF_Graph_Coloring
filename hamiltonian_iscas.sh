@@ -16,20 +16,19 @@ cd ./iscas89/
 g++ -o gen_testcase gen_testcase.cpp
 python3 bench_to_blif.py "$instance"
 
-# start1=`date +%s.%N`
-# python3 explicit_gen_iscas.py "$instance" "-e"
-# # this will generate iscas_graph.txt
-# end_p=`date +%s.%N`
-# # Run the POPSAT solver
-# # echo "######################################################"
-# echo -e "\nRun the POPSAT solver"
-# cd ../popsatgcpbcp/source
-# python3 main.py "--instance=../../iscas89/sample/iscas_graph.txt" "--model=POP-S" "--timelimit=$timelimit"
+start1=`date +%s.%N`
+python3 explicit_gen_iscas.py "$instance"
+# this will generate iscas_graph.txt
+end_p=`date +%s.%N`
+# Run the google ortool solver
+# echo "######################################################"
+echo -e "\nRun the google ortool solver"
+python3 hamiltonian_solve_ortools.py
 
-# end1=`date +%s.%N`
+end1=`date +%s.%N`
 
 echo "######################################################"
-# cd ../../iscas89
+# cd ../iscas89
 start2=`date +%s.%N`
 # Generate the blif file
 python3 blif_gen_iscas_hamiltonian.py "$instance"
@@ -50,9 +49,9 @@ cd ../../pedant-solver/build/src
 end2=`date +%s.%N`
 
 echo "######################################################"
-# runtime1=$( echo "$end1 - $start1" | bc -l )
-# echo -e "\nRuntime for SAT was $runtime1 seconds.\n"
-# runtime_p=$( echo "$end_p - $start1" | bc -l )
-# echo -e "\nRuntime for explicit_gen_iscas.py was $runtime_p seconds.\n"
+runtime1=$( echo "$end1 - $start1" | bc -l )
+echo -e "\nRuntime for ortool was $runtime1 seconds.\n"
+runtime_p=$( echo "$end_p - $start1" | bc -l )
+echo -e "\nRuntime for explicit_gen_iscas.py was $runtime_p seconds.\n"
 runtime2=$( echo "$end2 - $start2" | bc -l )
 echo -e "\nRuntime for DQBF was $runtime2 seconds.\n"
