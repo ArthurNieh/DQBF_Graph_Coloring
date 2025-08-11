@@ -351,6 +351,74 @@ def add_n_comparator(blif_lines, num):
 
     blif_lines.append(".end\n\n")
 
+def add_1_adder(blif_lines):
+    # A + B = S, C_out
+    blif_lines.append(".model adder\n")
+    blif_lines.append(".inputs A B C_in\n")
+    blif_lines.append(".outputs S C_out\n")
+    blif_lines.append(".names A B C_in S\n")
+    # blif_lines.append("000 0\n")
+    blif_lines.append("001 1\n")
+    blif_lines.append("010 1\n")
+    # blif_lines.append("011 0\n")
+    blif_lines.append("100 1\n")
+    # blif_lines.append("101 0\n")
+    # blif_lines.append("110 0\n")
+    blif_lines.append("111 1\n")
+    
+    blif_lines.append(".names A B C_in C_out\n")
+    # blif_lines.append("000 0\n")
+    # blif_lines.append("001 0\n")
+    # blif_lines.append("010 0\n")
+    blif_lines.append("011 1\n")
+    # blif_lines.append("100 0\n")
+    blif_lines.append("101 1\n")
+    blif_lines.append("110 1\n")
+    blif_lines.append("111 1\n")
+
+    blif_lines.append(".end\n\n")
+
+def add_n_adder(blif_lines, num):
+    # A + B = S, do a mod sum, no addition bit
+    if ".model adder\n" not in blif_lines:
+        add_1_adder(blif_lines)
+    if f".model adder{num}\n" in blif_lines:
+        return
+    
+    blif_lines.append(f".model adder{num}\n")
+    blif_lines.append(".inputs ")
+    for i in range(num):
+        blif_lines.append(f"A{i} ")
+    for i in range(num):
+        blif_lines.append(f"B{i} ")
+    blif_lines.append("\n.outputs ")
+    for i in range(num):
+        blif_lines.append(f"S{i} ")
+    blif_lines.append("\n")
+
+    # set C_num = 0
+    blif_lines.append(f".names C0\n")
+    blif_lines.append("0\n")
+
+    for i in range(0, num):
+        blif_lines.append(f".subckt adder A=A{i} B=B{i} C_in=C{i} S=S{i} C_out=C{i+1}\n")
+
+    blif_lines.append(".end\n\n")
+
+def add_is_0(blif_lines, num):
+
+    blif_lines.append(".model is_zero\n")
+    blif_lines.append(".inputs ")
+    for i in range(num):
+        blif_lines.append(f"I{i} ")
+    blif_lines.append("\n.outputs O\n")
+    blif_lines.append(".names ")
+    for i in range(num):
+        blif_lines.append(f"I{i} ")
+    blif_lines.append("O\n")
+    blif_lines.append("0" * num + " 1\n")
+    blif_lines.append(".end\n\n")
+
 ### All fundamental gates
 def add_not_gate(blif_lines):
     blif_lines.append(".model not\n")
@@ -457,6 +525,26 @@ def add_UnequivV(blif_lines, num):
     blif_lines.append(".subckt or" + str(num))
     for i in range(num):
         blif_lines.append(" I" + str(i) + "=unequal" + str(i))
+    blif_lines.append(" O=O_equal\n")
+    blif_lines.append(".end\n\n")
+    return
+
+def add_UequivV(blif_lines, num):
+    # vector U and V are equivalent
+    blif_lines.append(".model UequV" + str(num) + "\n")
+    blif_lines.append(".inputs ")
+    for i in range(num):
+        blif_lines.append("U" + str(i) + " ")
+    for i in range(num):
+        blif_lines.append("V" + str(i) + " ")
+    blif_lines.append("\n")
+    blif_lines.append(".outputs O_equal\n")
+
+    for i in range(num):
+        blif_lines.append(".subckt equiv I0=U" + str(i) + " I1=V" + str(i) + " O=equal" + str(i) + "\n")
+    blif_lines.append(".subckt and" + str(num))
+    for i in range(num):
+        blif_lines.append(" I" + str(i) + "=equal" + str(i))
     blif_lines.append(" O=O_equal\n")
     blif_lines.append(".end\n\n")
     return
