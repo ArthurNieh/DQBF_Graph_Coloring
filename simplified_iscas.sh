@@ -6,23 +6,32 @@
 
 instance=$1
 colorability=$2
+FF_tokeep=$3
 timelimit=$((3 * 60 * 60))
+
 if [ -z "$instance" ]; then
-    echo "Usage: $0 <iscas89_instance> <colorability>"
+    echo "Usage: $0 <iscas89_instance> <colorability> <FF_tokeep>"
     exit 1
 fi
 if [ -z "$colorability" ]; then
-    echo "Usage: $0 <iscas89_instance> <colorability>"
+    echo "Usage: $0 <iscas89_instance> <colorability> <FF_tokeep>"
+    exit 1
+fi
+if [ -z "$FF_tokeep" ]; then
+    echo "Usage: $0 <iscas89_instance> <colorability> <FF_tokeep>"
     exit 1
 fi
 
 # Generate the blif file of the iscas89 benchmark
 cd ./iscas89/
 g++ -o gen_testcase gen_testcase.cpp
-python3 bench_to_blif.py "$instance"
+
+python3 simplify_bench.py "$instance" "$FF_tokeep"
+
+python3 bench_to_blif.py "${instance}_simplified"
 
 start1=`date +%s.%N`
-python3 explicit_gen_iscas.py "$instance"
+python3 explicit_gen_iscas.py "${instance}_simplified"
 # this will generate iscas_graph.txt
 end_p=`date +%s.%N`
 # Run the POPSAT solver
@@ -37,7 +46,7 @@ echo "######################################################"
 start2=`date +%s.%N`
 # Generate the blif file
 cd ../../iscas89
-python3 blif_gen_iscas_coloring.py "$instance" "$colorability" "1"
+python3 blif_gen_iscas_coloring.py "${instance}_simplified" "$colorability" "1"
 # this will generate lsfr.blif
 
 # Generate DQDIMACS for the DQBF solver
@@ -46,7 +55,7 @@ echo "Generate DQDIMACS file"
     ## this part is written at /home/arthur/program/abc/dqbf
     ## the abc have been modified to support DQBF
 cd ../abc/dqbf
-python3 convert_to_cnf.py "../../iscas89/sample/${instance}_color.blif"
+python3 convert_to_cnf.py "../../iscas89/sample/${instance}_simplified_color.blif"
 
 start3=`date +%s.%N`
 # Run the DQBF solver
