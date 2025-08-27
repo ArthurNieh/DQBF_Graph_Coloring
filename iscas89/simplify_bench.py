@@ -23,7 +23,7 @@ def write_bench_file(file_path, lines):
 def simplify_bench(lines, num_dffs_to_keep=3):
     new_lines = []
     dff_count = 0
-    
+
     for line in lines:
         if 'DFF' in line:
             if dff_count < num_dffs_to_keep:
@@ -35,7 +35,11 @@ def simplify_bench(lines, num_dffs_to_keep=3):
             # Modify the line to reflect the number of DFFs kept
             parts = line.split()
             if len(parts) > 1:
-                parts[1] = str(num_dffs_to_keep)
+                if int(parts[1]) >= num_dffs_to_keep:
+                    print(f"Reducing flipflops from {parts[1]} to {num_dffs_to_keep}")
+                    parts[1] = str(num_dffs_to_keep)
+                else:
+                    print(f"[Warning] Keeping flipflops at {parts[1]}")
                 new_lines.append(' '.join(parts) + '\n')
         else:
             new_lines.append(line)
