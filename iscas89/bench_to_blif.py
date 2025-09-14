@@ -17,6 +17,7 @@ def gen_parse_bench_script(input_file):
 
     with open(f'{iscas_bench_dir}parse_bench.sh', 'w') as f:
         f.write('read ' + iscas_bench_dir + input_file + '\n')
+        f.write('fraig\n')
         f.write('strash\n')
         f.write('print_io\n')
         f.write('comb\n')
