@@ -1,3 +1,4 @@
+import csv
 import re
 import sys
 import os
@@ -32,6 +33,8 @@ def parse_log(file_path):
                 result = "SATISFIABLE"
             # Extract runtimes
             elif line.startswith("Runtime for DQBF"):
+                print(instance, color, ff_tokeep)
+                print(line)
                 runtime_dqbf = float(re.findall(r"[\d.]+", line)[0])
             elif line.startswith("Runtime for pedant"):
                 runtime_pedant = float(re.findall(r"[\d.]+", line)[0])
@@ -77,6 +80,17 @@ def parse_log_sat(file_path):
             # FF_tokeep
             if line.startswith("FF_tokeep="):
                 ff_tokeep = int(line.split("=")[1])
+
+            if line.startswith('Traceback'):
+                print(f'Found Traceback in instance {instance} with FF_tokeep={ff_tokeep}. Skipping this log.')
+                # Reset all variables
+                time_for_construction = {}
+                upper_bound = None
+                lower_bound = None
+                runtime_sat = -1
+                runtime_explicit = -1
+                runtime_popsat = -1
+                break
 
             # Time for n-Construction (can appear multiple times)
             m = re.match(r"Time for (\d+)-Construction:\s*([\d.]+)s", line)
@@ -124,6 +138,13 @@ def dump_json(results_map, file_name="results.json"):
 
     print("Results dumped to", file_name)
 
+def dump_csv(result, file_name='combined_result.csv'):
+    with open(file_name, "w", newline="") as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(["Instance", "FF_tokeep", "Color", "DQBF Result", "Lower Bound", "Upper Bound", "Runtime SAT", "Runtime DQBF"])
+        for row in result:
+            csv_writer.writerow(row)
+    print("Results dumped to", file_name)
 
 def parse_logs_in_directory(dir_path):
 
@@ -201,13 +222,70 @@ def parse_logs_sat_in_directory(dir_path):
 
     return sorted_results
 
+def compare_results(dqbf_result, sat_result):
+
+    TIME_LIMIT = 3600 # time limit 3600s = 1hr
+
+    combined_result = []
+
+    print("======== COMPARISON ========")
+    for inst in dqbf_result:
+        if inst not in sat_result:
+            print(f"[Warning] Instance {inst} missing in SAT results.")
+            continue
+
+        for ff in dqbf_result[inst]:
+            if ff not in sat_result[inst]:
+                print(f"[Warning] Instance {inst} with FF_tokeep={ff} missing in SAT results.")
+                continue
+
+            dqbf_colors = dqbf_result[inst][ff]
+            sat_data = sat_result[inst][ff]
+
+            # if sat_data["runtime_sat"] is None or float(sat_data["runtime_sat"]) >= TIME_LIMIT:
+            #     print(f"[Timeout] Instance {inst}, FF_tokeep={ff} exceeds time limit: {sat_data['runtime_sat']}")
+            #     continue
+
+            for color in dqbf_colors:
+                dqbf_entry = dqbf_colors[color]
+                dqbf_res = dqbf_entry["result"]
+                upper_bound = sat_data["upper_bound"]
+                lower_bound = sat_data["lower_bound"]
+
+                sat_data_runtime = sat_data["runtime_sat"] if (sat_data["runtime_sat"] is not None) and float(sat_data["runtime_sat"]) >=0 and float(sat_data["runtime_sat"]) < 3600 else 'Timeout'
+                dqbf_runtime = dqbf_entry["runtime_dqbf"] if (dqbf_entry["runtime_dqbf"] is not None) and float(dqbf_entry["runtime_dqbf"]) >=0 and float(dqbf_entry["runtime_dqbf"]) < 3600 else 'Timeout'
+                combined_result.append([inst, ff, color, dqbf_res, lower_bound, upper_bound, sat_data_runtime, dqbf_runtime])
+
+                if sat_data["runtime_sat"] == -1 or sat_data["runtime_sat"] is None or float(sat_data["runtime_sat"]) >= TIME_LIMIT:
+                    continue
+
+                if upper_bound != lower_bound:
+                    print(f"[Warning] Discrepancy for {inst}, FF_tokeep={ff}, color={color}: DQBF result={dqbf_res} but SAT bounds=({lower_bound}, {upper_bound})")
+                elif lower_bound == color and dqbf_res == "SATISFIABLE":
+                    print(f"[Info] Match for {inst}, FF_tokeep={ff}, color={color}: Both DQBF and SAT indicate SATISFIABLE at this color.")
+
+                if dqbf_res == "UNSATISFIABLE":
+                    if lower_bound is not None and color >= lower_bound:
+                        print(f"[Warning] Discrepancy for {inst}, FF_tokeep={ff}, color={color}: DQBF UNSAT but SAT bounds=({lower_bound}, {upper_bound})")
+                elif dqbf_res == "SATISFIABLE":
+                    if lower_bound is not None and color < lower_bound:
+                        print(f"[Warning] Discrepancy for {inst}, FF_tokeep={ff}, color={color}: DQBF SAT but SAT bounds=({lower_bound}, {upper_bound})")
+    print("=======================")
+    # print(combined_result)
+    return combined_result
+
 def main():
     dir_path = sys.argv[1]
-    # results = parse_logs_in_directory(dir_path)
-    # dump_json(results, os.path.join(dir_path, "results.json"))
+    sat_dir_path = sys.argv[2]
+    
+    dqbf_results = parse_logs_in_directory(dir_path)
+    dump_json(dqbf_results, os.path.join(dir_path, "results.json"))
 
-    result = parse_logs_sat_in_directory(dir_path)
-    dump_json(result, os.path.join(dir_path, "results_sat.json"))
+    sat_result = parse_logs_sat_in_directory(sat_dir_path)
+    dump_json(sat_result, os.path.join(sat_dir_path, "results_sat.json"))
+
+    combined_result = compare_results(dqbf_results, sat_result)
+    dump_csv(combined_result, "combined_result.csv")
 
 if __name__ == "__main__":
     main()
