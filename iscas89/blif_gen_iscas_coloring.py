@@ -43,6 +43,8 @@ def parse_bench():
         lines = f.readlines()
     
     for line in lines:
+        if 'Warning' in line:
+            continue
         line = line.split(' ')
         if len(line) < 2:
             continue
@@ -56,7 +58,7 @@ def parse_bench():
             print(f"Number of inputs: {PI_num}")
 
         elif line[1] == "outputs":
-            PO_num = int(line[2].strip("():"))
+            PO_num = int(line[2].strip("():\n"))
             for i in range(PO_num):
                 po = line[3+i].strip('\n').split('=')[1]
                 PO_list.append(po)
