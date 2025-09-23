@@ -10,3 +10,9 @@
 [submodule "DQBDD"]
 	path = DQBDD
 	url = https://github.com/Enfest/DQBDD.git
+[submodule "DSSATpre"]
+	path = DSSATpre
+	url = git@github.com:ArthurNieh/DSSATpre.git
+[submodule "SharpSSAT"]
+	path = SharpSSAT
+	url = git@github.com:ArthurNieh/SharpSSAT.git
