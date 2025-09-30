@@ -2,6 +2,7 @@
 from pysat.formula import CNF
 from pysat.card import CardEnc
 from pysat.solvers import Minisat22
+from pysat.solvers import Cadical195
 
 import argparse
 
@@ -74,6 +75,19 @@ def encode_k_clique(n, edges, k):
 
     return cnf
 
+def solve_k_clique_with_cadical(n, edges, k):
+    cnf = encode_k_clique(n, edges, k)
+
+    with Cadical195(bootstrap_with=cnf.clauses) as solver:
+        sat = solver.solve()
+        print(sat)
+        if sat:
+            model = solver.get_model()
+            clique = [i for i in range(1,n+1) if model[i-1] > 0]  # keep positives
+            return clique
+        else:
+            return None
+
 def solve_k_clique(n, edges, k):
     cnf = encode_k_clique(n, edges, k)
 
@@ -93,14 +107,22 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="k-Clique SAT solver")
     parser.add_argument("-k", type=int, default=3, help="Size of clique to find", required=True)
     parser.add_argument("--graph_file", type=str, help="Input graph file", required=True)
+    parser.add_argument("--solver", type=str, choices=["minisat", "cadical"], default="cadical", help="SAT solver to use")
     args = parser.parse_args()
     k = args.k
     graph_file = args.graph_file
+    solver_choice = args.solver
 
     n, edges = parse_graph_file(graph_file)
     print(f"Graph has {n} vertices and {len(edges)} edges")
 
-    clique = solve_k_clique(n, edges, k)
+    if solver_choice == "cadical":
+        print("Using Cadical solver")
+        clique = solve_k_clique_with_cadical(n, edges, k)
+    else:
+        print("Using Minisat solver")
+        clique = solve_k_clique(n, edges, k)
+    
     if clique:
         print(f"Found clique of size {k}: {clique}")
     else:

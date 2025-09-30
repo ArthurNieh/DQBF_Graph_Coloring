@@ -28,9 +28,10 @@ fi
 cd ./iscas89/
 g++ -o gen_testcase gen_testcase.cpp
 
-python3 simplify_bench.py "$instance" "$FF_tokeep"
+# python3 simplify_bench.py "$instance" "$FF_tokeep"
 
-python3 bench_to_blif.py "${instance}_simplified"
+# python3 bench_to_blif.py "${instance}_simplified"
+python3 reduce_bench2blif.py "$instance" "$FF_tokeep" 100
 
 start1=`date +%s.%N`
 timeout 1h python3 explicit_gen_iscas.py "${instance}_simplified"
