@@ -9,7 +9,7 @@
 mkdir -p iscas89/result/clique_simplified/
 rm iscas89/benchmarks/*simplified.*
 
-for (( FF_num=17; FF_num<=18; FF_num=FF_num+1 )); do
+for (( FF_num=29; FF_num<=32; FF_num=FF_num+1 )); do
 	for (( i=3; i<=8; i=i+1 )); do
 	# Create an array of sorted benchmarks by numeric instance number
 		mapfile -t sorted_benches < <(
@@ -48,7 +48,19 @@ for (( FF_num=17; FF_num<=18; FF_num=FF_num+1 )); do
 			if [[ "$ins" == "s298" || \
 				"$ins" == "s344" || \
 				"$ins" == "s349" || \
-				"$ins" == "s420" ]]; then
+				"$ins" == "s420" || \
+				"$ins" == "s641" || \
+				"$ins" == "s713" || \
+				"$ins" == "s1196" || \
+				"$ins" == "s1238" ]]; then
+				echo "$ins skip"
+				continue
+			fi
+
+			if [[ "$ins" == "s382" || \
+				"$ins" == "s400" || \
+				"$ins" == "s444" || \
+				"$ins" == "s526" ]]; then
 				echo "$ins skip"
 				continue
 			fi

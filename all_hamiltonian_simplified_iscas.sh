@@ -3,12 +3,12 @@
 # Load FF table
 source ./ff_table.sh
 
-dir_path="iscas89/result/simplified_sat/"
+dir_path="iscas89/result/hamiltonian_simplified/"
 
 mkdir -p "$dir_path"
 rm iscas89/benchmarks/*simplified.*
 
-for (( FF_num=11; FF_num<=14; FF_num=FF_num+1 )); do
+for (( FF_num=3; FF_num<=3; FF_num=FF_num+1 )); do
 	# Create an array of sorted benchmarks by numeric instance number
 	mapfile -t sorted_benches < <(
 		for f in iscas89/benchmarks/s*.bench; do
@@ -47,7 +47,7 @@ for (( FF_num=11; FF_num<=14; FF_num=FF_num+1 )); do
 			continue
 		fi
 
-		./sat_simplified_iscas.sh "$ins" "$FF_num" &>> "$file_name"
+		./hamiltonian_simplified_iscas.sh "$ins" "$FF_num" &>> "$file_name"
 
 		rm iscas89/benchmarks/*simplified.*
 	done
