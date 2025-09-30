@@ -3,8 +3,6 @@
 #include<iostream>
 #include<string>
 
-std::string file_name = "./sample/test_cases.txt";
-
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -14,6 +12,7 @@ int main(int argc, char *argv[])
     }
 
     int bit_number = std::stoi(argv[1]);
+    std::string file_name = "./sample/test_cases_" + std::to_string(bit_number) + ".txt";
 
     std::ofstream output(file_name);
     if (!output)

@@ -14,7 +14,6 @@ iscas_dir = './'
 sample_dir = './sample/'
 bench_dir = './benchmarks/'
 output_file = "iscas_graph.txt"
-test_case_file = "test_cases.txt"
 abc_script = "abc_script.sh"
 abc_output = "abc_output.txt"
 
@@ -55,23 +54,16 @@ def parse_iscas_file(ins):
 def generate_test_cases():
     global input_num, FF_num
 
-    # with open(sample_dir + test_case_file, "w") as f:
-        # for state in product([0, 1], repeat=FF_num):
-        #     st = "".join(str(x) for x in state)
-        #     for input in product([0, 1], repeat=input_num):
-        #         x = "".join(str(y) for y in input)
-        #         f.write(f"{x}{st}\n")
-        # for test_case in product([0, 1], repeat=input_num + FF_num):
-        #     x = "".join(str(y) for y in test_case)
-        #     f.write(f"{x}\n")
-        # f.writelines(
-        #     "".join(map(str, test_case)) + "\n"
-        #     for test_case in product([0, 1], repeat=input_num + FF_num)
-        # )
-    os.system(f"./gen_testcase {input_num+FF_num}") 
+    if not os.path.exists(sample_dir):
+        os.makedirs(sample_dir)
+    if not os.path.exists(sample_dir + f"test_cases_{input_num+FF_num}.txt"):
+        os.system(f"./gen_testcase {input_num+FF_num}") 
     return
 
 def gen_abc_script(ins):
+    global input_num, FF_num
+
+    test_case_file = f"test_cases_{input_num+FF_num}.txt"
 
     with open(sample_dir + abc_script, "w") as f:
         f.write(f"read ../iscas89/benchmarks/{ins}.blif\n")

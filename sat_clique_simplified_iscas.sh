@@ -27,6 +27,11 @@ fi
 # Generate the blif file of the iscas89 benchmark
 cd ./iscas89/
 g++ -o gen_testcase gen_testcase.cpp
+for i in {3..50}; do
+    if [ ! -f ./sample/test_cases_$i.txt ]; then
+        ./gen_testcase $i
+    fi
+done
 
 # python3 simplify_bench.py "$instance" "$FF_tokeep"
 
