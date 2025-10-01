@@ -2,13 +2,14 @@
 
 # Load FF table
 source ./ff_table.sh
+source ./pi_table.sh
 
 dir_path="iscas89/result/simplified_sat/"
 
 mkdir -p "$dir_path"
 rm iscas89/benchmarks/*simplified.*
 
-for (( FF_num=11; FF_num<=14; FF_num=FF_num+1 )); do
+for (( FF_num=28; FF_num<=28; FF_num=FF_num+1 )); do
 	# Create an array of sorted benchmarks by numeric instance number
 	mapfile -t sorted_benches < <(
 		for f in iscas89/benchmarks/s*.bench; do
@@ -43,6 +44,15 @@ for (( FF_num=11; FF_num<=14; FF_num=FF_num+1 )); do
 			continue
 		fi
 		if (( ff_threshold < FF_num )); then
+			echo "$ins skip"
+			continue
+		fi
+		pi_threshold=${pi_table[$ins]}
+		if [ -z "$pi_threshold" ]; then
+			echo "No PI number found for $ins, skipping..."
+			continue
+		fi
+		if (( pi_threshold+FF_num > 30 )); then
 			echo "$ins skip"
 			continue
 		fi

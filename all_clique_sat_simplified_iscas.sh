@@ -2,6 +2,7 @@
 
 # Load FF table
 source ./ff_table.sh
+source ./pi_table.sh
 
 mkdir -p iscas89/result/clique_simplified_sat/
 rm iscas89/benchmarks/*simplified.*
@@ -35,6 +36,15 @@ for (( FF_num=3; FF_num<=16; FF_num=FF_num+1 )); do
 				continue
 			fi
 			if (( ff_threshold < FF_num )); then
+				echo "$ins skip"
+				continue
+			fi
+			pi_threshold=${pi_table[$ins]}
+			if [ -z "$pi_threshold" ]; then
+				echo "No PI number found for $ins, skipping..."
+				continue
+			fi
+			if (( pi_threshold+FF_num > 30 )); then
 				echo "$ins skip"
 				continue
 			fi
