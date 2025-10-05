@@ -462,6 +462,8 @@ def add_nequiv_gate(blif_lines): # xor gate
     return
 
 def add_or_num(blif_lines, num):
+    if f".model or{num}\n" in blif_lines:
+        return
     blif_lines.append(".model or" + str(num) + "\n")
     blif_lines.append(".inputs ")
     for i in range(num):
@@ -480,6 +482,8 @@ def add_or_num(blif_lines, num):
     return
 
 def add_and_num(blif_lines, num):
+    if f".model and{num}\n" in blif_lines:
+        return
     # num = int(u_num/2)
     blif_lines.append(".model and" + str(num) + "\n")
     blif_lines.append(".inputs ")
