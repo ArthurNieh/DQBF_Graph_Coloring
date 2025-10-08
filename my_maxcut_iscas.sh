@@ -48,10 +48,12 @@ cd ../../DSSATpre/build/src
 
 echo "######################################################"
 
-# cd ../../../SharpSSAT
-# ./SharpSSAT -s -p ../DSSATpre/build/src/dssat_input.sdimacs
-cd ../../../../solvers/elimssat/
-./abc -q "ssat" ~/DQBF_Graph_Coloring/DSSATpre/build/src/dssat_input.sdimacs
+cd ../../../SharpSSAT
+./SharpSSAT -s -p ../DSSATpre/build/src/dssat_input.sdimacs
+# cd ../../../../solvers/elimssat/
+# ./abc -q "ssat" ~/DQBF_Graph_Coloring/DSSATpre/build/src/dssat_input.sdimacs
+# cd ../../../../solvers/ClauSSat
+# ./claussat -sguwc ../../DQBF_Graph_Coloring/DSSATpre/build/src/dssat_input.sdimacs
 
 end2=`date +%s.%N`
 

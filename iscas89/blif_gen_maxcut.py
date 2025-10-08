@@ -104,19 +104,19 @@ def maxcut_add_main_model_2(blif_lines, iscas_case, u_num, PI_num, k_bits):
 
 ### Graph subcircuit
     # graph(u,v,x)
-    # blif_lines.append(".subckt graph ")
-    # blif_lines.extend(f"U{i}=u{i} " for i in range(u_num))
-    # blif_lines.extend(f"V{i}=v{i} " for i in range(u_num))
-    # blif_lines.extend(f"I{i}=x{i} " for i in range(PI_num))
-    # blif_lines.append("E=e1\n")
+    blif_lines.append(".subckt graph ")
+    blif_lines.extend(f"U{i}=u{i} " for i in range(u_num))
+    blif_lines.extend(f"V{i}=v{i} " for i in range(u_num))
+    blif_lines.extend(f"I{i}=x{i} " for i in range(PI_num))
+    blif_lines.append("E=e1\n")
 
-    # blif_lines.append(".subckt graph ")
-    # blif_lines.extend(f"U{i}=v{i} " for i in range(u_num))
-    # blif_lines.extend(f"V{i}=u{i} " for i in range(u_num))
-    # blif_lines.extend(f"I{i}=x{i} " for i in range(PI_num))
-    # blif_lines.append("E=e2\n")
-    # blif_lines.append(".subckt or2 I0=e1 I1=e2 O=euvx\n")
-    blif_lines.append(".names euvx\n1\n")
+    blif_lines.append(".subckt graph ")
+    blif_lines.extend(f"U{i}=v{i} " for i in range(u_num))
+    blif_lines.extend(f"V{i}=u{i} " for i in range(u_num))
+    blif_lines.extend(f"I{i}=x{i} " for i in range(PI_num))
+    blif_lines.append("E=e2\n")
+    blif_lines.append(".subckt or2 I0=e1 I1=e2 O=euvx\n")
+    # blif_lines.append(".names euvx\n1\n")
 
 ### u, v the same
     blif_lines.append(f".subckt UequV{u_num} ")
