@@ -130,6 +130,13 @@ def dump_graph():
         for e in E:
             f.write(f"e {e[0]} {e[1]}\n")
 
+def dump_graph_maxcut():
+    global E, total_states, output_file, sample_dir
+    with open(sample_dir + output_file, "w") as f:
+        f.write(f"{total_states} {len(E)}\n")
+        for e in E:
+            f.write(f"{e[0]} {e[1]} 1\n")
+
 def remove_dup(x):
     # Remove duplicates from list while preserving order
     # This is a common Python idiom to remove duplicates
@@ -173,6 +180,8 @@ if __name__ == "__main__":
         print("Verbose mode enabled")
     elif vflag == "e":
         print("Edge mode enabled")
+    elif vflag == "m":
+        print("Maxcut mode enabled")
     else:
         print("Verbose mode disabled")
     start_time = time.time()
@@ -204,8 +213,12 @@ if __name__ == "__main__":
 
     if vflag == "e":
         E = gen_line_graph(E)
-
-    dump_graph()
+    
+    if vflag == "m":
+        dump_graph_maxcut()
+    else:
+        dump_graph()
+    
     dump_time = time.time()
     print(f"Dump graph time: {dump_time - remove_dup_time:.2f} seconds")
     print(f"Total time: {dump_time - start_time:.2f} seconds")
