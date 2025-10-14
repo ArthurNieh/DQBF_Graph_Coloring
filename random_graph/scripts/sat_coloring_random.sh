@@ -5,11 +5,16 @@
 # Usage: ./iscas.sh
 
 instance=$1
+trial=$2
 timelimit=$((60 * 60))
 
 if [ -z "$instance" ]; then
-    echo "Usage: $0 <iscas89_instance>"
+    echo "Usage: $0 <iscas89_instance> <trial>"
     exit 1
+fi
+if [ -z "$trial" ]; then
+    echo "No trial specified, defaulting to 0"
+    trial=0
 fi
 
 # Generate the blif file of the iscas89 benchmark
@@ -22,11 +27,11 @@ fi
 # done
 
 cd ../
-
-python3 blif_gen_random_graph_coloring.py -n "$instance" --gen_graph
+echo "$instance, trial $trial"
+python3 blif_gen_random_graph_coloring.py -n "$instance" -t "$trial" --gen_graph
 
 start1=`date +%s.%N`
-timeout 1h python3 explicit_gen_random_graph.py -n "$instance"
+timeout 1h python3 explicit_gen_random_graph.py -n "$instance" -t "$trial"
 # this will generate iscas_graph.txt
 end_p=`date +%s.%N`
 # Run the POPSAT solver

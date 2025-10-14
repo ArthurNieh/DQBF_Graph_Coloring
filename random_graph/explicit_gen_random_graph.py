@@ -16,11 +16,11 @@ def generate_test_cases(num):
         os.system(f"./gen_testcase {num}") 
     return
 
-def gen_abc_script(num, script_file="abc_script.sh"):
+def gen_abc_script(num, script_file="abc_script.sh", graph_file=None):
     test_case_file = f"test_cases_{2*num}.txt"
 
     with open(script_file, "w") as f:
-        f.write(f"read ./sample/random_graph_n{num}_graph.blif\n")
+        f.write(f"read {graph_file}\n")
         f.write("strash\n")
         f.write("time\n")
         f.write("sim -A ../iscas89/sample/" + test_case_file + " -v \n")
@@ -120,6 +120,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate explicit graph from random graph instance.')
     parser.add_argument('-n', type=int, help='Size of the hash function (number of bits).', required=True)
     parser.add_argument('-d', action='store_true', help='Generate directed graph (default is undirected).')
+    parser.add_argument('--trial', '-t', type=int, default=0, help='Trial number (default is 0).')
     parser.add_argument('--png', action='store_true', help='Generate graph visualization in PNG format.')
     args = parser.parse_args()
 
@@ -129,16 +130,20 @@ if __name__ == "__main__":
 
     png = args.png
 
+    trial = args.trial
+
     iscas_dir = './'
     sample_dir = './sample/'
     bench_dir = './benchmarks/'
     output_file = "iscas_graph.txt"
     abc_script = "abc_script.sh"
-    
+
+    random_graph_file = f"./graphs/random_graph_n{n}_trial{trial}_graph.blif"
+    output_graph_file = f"./sample/random_graph_n{n}_trial{trial}_explicit.txt"
     E = [] # List of edges
 
     start_time = time.time()
-    gen_abc_script(n, abc_script)
+    gen_abc_script(n, abc_script, graph_file=random_graph_file)
     gen_script_time = time.time()
     print(f"Generate abc script time: {gen_script_time - start_time:.2f} seconds")
 

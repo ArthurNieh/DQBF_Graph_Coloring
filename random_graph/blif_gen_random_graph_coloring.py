@@ -28,14 +28,14 @@ def add_main_model(u_num, c_num):
     blif_lines.append(".subckt graph ")
     blif_lines.extend([f"U{i}=u{i} " for i in range(u_num)])
     blif_lines.extend([f"V{i}=v{i} " for i in range(u_num)])
-    blif_lines.append("E=e1\n")
+    blif_lines.append("E=e0\n")
 
-    blif_lines.append(".subckt graph ")
-    blif_lines.extend([f"U{i}=v{i} " for i in range(u_num)])
-    blif_lines.extend([f"V{i}=u{i} " for i in range(u_num)])
-    blif_lines.append("E=e2\n")
+    # blif_lines.append(".subckt graph ")
+    # blif_lines.extend([f"U{i}=v{i} " for i in range(u_num)])
+    # blif_lines.extend([f"V{i}=u{i} " for i in range(u_num)])
+    # blif_lines.append("E=e2\n")
 
-    blif_lines.append(".subckt or2 I0=e1 I1=e2 O=e0\n")
+    # blif_lines.append(".subckt or2 I0=e1 I1=e2 O=e0\n")
 
 ### U, V not equal subcircuit
     blif_lines.append(f".subckt UneqV{u_num} ")
@@ -75,6 +75,77 @@ def add_main_model(u_num, c_num):
     blif_lines.append(".subckt and2 I0=colorencode I1=phi12 O=f\n")
 
     blif_lines.append(".end\n\n")
+
+def add_simple_implicit_graph(blif_lines, graph_file, u_num, output_graph_file):
+    if "\n.model graph\n" in blif_lines:
+        print("[Warning] model graph already exists.")
+        return
+    
+    A_b = []
+    with open(graph_file, 'r') as f:
+        for line in f:
+            A_b.extend([int(x) for x in line.strip().split(',')])
+
+    assert (len(A_b) == 2*u_num + 1), f"Error: Graph file should contain {2*u_num + 1} elements, but got {len(A_b)}"
+
+    blif_graph = []
+
+    blif_graph.append("\n.model graph\n")
+    blif_graph.append(".inputs ")
+    blif_graph.extend([f"U{i} " for i in range(u_num)])
+    blif_graph.extend([f"V{i} " for i in range(u_num)])
+    blif_graph.append("\n")
+    blif_graph.append(".outputs E\n")
+
+    # Create a constant-1 signal
+    blif_graph.append(f".names CONST1\n1\n")
+
+    queue = []
+    queue2 = [] # queue2 for symmetric edges
+
+    for j in range(2 * u_num):
+        if A_b[j] == 1:
+            if j < u_num:
+                inp = f"U{j}"
+                inp2 = f"V{j}"
+            else:
+                inp = f"V{j - u_num}"
+                inp2 = f"U{j - u_num}"
+            queue.append(inp)
+            queue2.append(inp2)
+    if A_b[-1] == 1:
+        queue.append("CONST1")
+        queue2.append("CONST1")
+    
+    while(len(queue) > 1):
+        a = queue.pop(0)
+        b = queue.pop(0)
+        new_signal = f"G{len(queue)}"
+        blif_graph.append(f".subckt xor2 I0={a} I1={b} O={new_signal}\n")
+        queue.append(new_signal)
+    final_output = queue[0]
+
+    while(len(queue2) > 1):
+        a = queue2.pop(0)
+        b = queue2.pop(0)
+        new_signal = f"Gs{len(queue2)}"
+        blif_graph.append(f".subckt xor2 I0={a} I1={b} O={new_signal}\n")
+        queue2.append(new_signal)
+    final_output2 = queue2[0]
+
+    blif_graph.append(f".subckt or2 I0={final_output} I1={final_output2} O=E\n")
+    blif_graph.append(".end\n\n")
+
+    blif_lines.extend(blif_graph)
+
+    add_nequiv_gate(blif_graph)
+    # add_and_num(blif_graph, 2)
+    add_or_num(blif_graph, 2)
+
+    with open(output_graph_file, "w") as f:
+        f.writelines(blif_graph)
+
+    return
 
 def add_implicit_graph(blif_lines, matrix_A_file, vector_b_file, u_num, output_graph_file):
 
@@ -182,7 +253,7 @@ def add_implicit_graph(blif_lines, matrix_A_file, vector_b_file, u_num, output_g
             p_out = pand
         else:  # or2
             p_out = por
-        print(f"[Info] Combining {a} (p={pa:.4f}) and {b} (p={pb:.4f}) with {gate_type}, new signal {new_signal} has prob={p_out:.4f}")
+        # print(f"[Info] Combining {a} (p={pa:.4f}) and {b} (p={pb:.4f}) with {gate_type}, new signal {new_signal} has prob={p_out:.4f}")
         prob[new_signal] = p_out
         queue.append(new_signal)
 
@@ -529,24 +600,28 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate blif file for random graph with coloring constraints.")
     parser.add_argument('-n', type=int, help='Number of nodes = 2^n (required)', required=True)
     parser.add_argument('-c', type=int, help='Colorability (required)', default=2)
+    parser.add_argument('-t', type=int, help='Trial number (for random graph generation)', default=0)
     parser.add_argument('--gen_graph', action='store_true', help='Generate implicit graph blif file')
     args = parser.parse_args()
 
     u_num = args.n
     colorability = args.c
     c_num = math.ceil(math.log2(colorability))
+    trial = args.t
 
-    matrix_A_file = f"./graphs/hash_matrix_A_size_{2*u_num}.csv"
-    vector_b_file = f"./graphs/hash_vector_b_size_{2*u_num}.csv"
+    # matrix_A_file = f"./graphs/hash_matrix_A_size_{2*u_num}.csv"
+    # vector_b_file = f"./graphs/hash_vector_b_size_{2*u_num}.csv"
+    graph_file = f"./graphs/random_graph_n{u_num}_trial{trial}.csv"
 
-    output_blif_file = f"./sample/random_graph_coloring_n{u_num}_c{colorability}.blif"
-    output_graph_file = f"./sample/random_graph_n{u_num}_graph.blif"
+    output_blif_file = f"./sample/random_graph_coloring_n{u_num}_c{colorability}_trial{trial}.blif"
+    output_graph_file = f"./graphs/random_graph_n{u_num}_trial{trial}_graph.blif"
 
     blif_lines = []
 
     # parse blif file generated by abc
     add_main_model(u_num, c_num)
-    add_implicit_graph(blif_lines, matrix_A_file, vector_b_file, u_num, output_graph_file)
+    # add_implicit_graph(blif_lines, matrix_A_file, vector_b_file, u_num, output_graph_file)
+    add_simple_implicit_graph(blif_lines, graph_file, u_num, output_graph_file)
     if args.gen_graph:
         exit(0)
     

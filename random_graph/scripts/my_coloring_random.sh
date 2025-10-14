@@ -7,14 +7,19 @@
 
 instance=$1
 colorability=$2
+trial=$3
 # solver=$3
 if [ -z "$instance" ]; then
-    echo "Usage: $0 <instance> <colorability>"
+    echo "Usage: $0 <instance> <colorability> [trial]"
     exit 1
 fi
 if [ -z "$colorability" ]; then
-    echo "Usage: $0 <instance> <colorability>"
+    echo "Usage: $0 <instance> <colorability> [trial]"
     exit 1
+fi
+if [ -z "$trial" ]; then
+    echo "No trial specified, defaulting to 0"
+    trial=0
 fi
 # if [ -z "$solver" ]; then
 #     echo "No solver specified, defaulting to pedant"
@@ -28,7 +33,7 @@ echo "Solving $instance for $colorability color\n"
 start2=`date +%s.%N`
 # Generate the blif file
 cd ../
-python3 blif_gen_random_graph_coloring.py -n "$instance" -c "$colorability"
+python3 blif_gen_random_graph_coloring.py -n "$instance" -c "$colorability" -t "$trial"
 # this will generate sample.blif
 
 # Generate DQDIMACS for the DQBF solver
@@ -38,7 +43,7 @@ echo "Generate DQDIMACS file"
     ## the abc have been modified to support DQBF
 cd ../abc/dqbf
 python3 convert_to_cnf.py \
-    "../../random_graph/sample/random_graph_coloring_n${instance}_c${colorability}.blif"
+    "../../random_graph/sample/random_graph_coloring_n${instance}_c${colorability}_trial${trial}.blif"
 
 # Run the DQBF solver
 cd ../../pedant-solver/build/src
