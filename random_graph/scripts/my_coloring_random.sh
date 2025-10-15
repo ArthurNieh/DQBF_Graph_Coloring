@@ -47,7 +47,7 @@ python3 convert_to_cnf.py \
 
 # Run the DQBF solver
 cd ../../pedant-solver/build/src
-./pedant ../../../abc/dqbf/dqdimacs.txt --cnf model
+timeout 1h ./pedant ../../../abc/dqbf/dqdimacs.txt --cnf model
 
 end2=`date +%s.%N`
 
