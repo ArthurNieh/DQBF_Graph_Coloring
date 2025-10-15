@@ -8,23 +8,23 @@
 instance=$1
 colorability=$2
 trial=$3
-# solver=$3
+solver=$4
 if [ -z "$instance" ]; then
-    echo "Usage: $0 <instance> <colorability> [trial]"
+    echo "Usage: $0 <instance> <colorability> [trial] [solver]"
     exit 1
 fi
 if [ -z "$colorability" ]; then
-    echo "Usage: $0 <instance> <colorability> [trial]"
+    echo "Usage: $0 <instance> <colorability> [trial] [solver]"
     exit 1
 fi
 if [ -z "$trial" ]; then
     echo "No trial specified, defaulting to 0"
     trial=0
 fi
-# if [ -z "$solver" ]; then
-#     echo "No solver specified, defaulting to pedant"
-#     solver="pedant"
-# fi
+if [ -z "$solver" ]; then
+    echo "No solver specified, defaulting to pedant"
+    solver="pedant"
+fi
 
 echo "######################################################"
 echo "Solving $instance for $colorability color\n"
@@ -46,8 +46,15 @@ python3 convert_to_cnf.py \
     "../../random_graph/sample/random_graph_coloring_n${instance}_c${colorability}_trial${trial}.blif"
 
 # Run the DQBF solver
-cd ../../pedant-solver/build/src
-timeout 1h ./pedant ../../../abc/dqbf/dqdimacs.txt --cnf model
+if [ "$solver" == "pedant" ]; then
+    echo "Run pedant solver"
+    cd ../../pedant-solver/build/src
+    timeout 1h ./pedant ../../../abc/dqbf/dqdimacs.txt --cnf model
+else
+    echo "Run DQBDD solver"
+    cd ../../bin/
+    timeout 1h ./dqbdd ../abc/dqbf/dqdimacs.txt
+fi
 
 end2=`date +%s.%N`
 
