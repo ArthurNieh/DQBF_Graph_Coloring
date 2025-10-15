@@ -544,6 +544,10 @@ def add_UequivV(blif_lines, num):
     # vector U and V are equivalent
     if f".model UequV{num}\n" in blif_lines:
         return
+    
+    add_equiv_gate(blif_lines)
+    add_and_num(blif_lines, num)
+
     blif_lines.append(".model UequV" + str(num) + "\n")
     blif_lines.append(".inputs ")
     for i in range(num):
