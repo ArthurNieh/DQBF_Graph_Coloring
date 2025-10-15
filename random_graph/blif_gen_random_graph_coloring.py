@@ -3,8 +3,8 @@
 # Modified from sudoku/blif_gen_auto.py
 # This script generates a blif file for ISCAS89 benchmarks with coloring constraints.
 # 
-# Author: Arhtur Nieh
-# Date: 2025-09-24
+# Author: Arthur Nieh
+# Date: 2025-10-15
 # Reference: https://www.notion.so/DQBF-on-Graphs-1ac570d5afa980eca2deef656ebd8b68?pvs=4
 
 import sys
