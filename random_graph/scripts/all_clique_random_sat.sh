@@ -25,7 +25,7 @@ for (( inst_n=3; inst_n<=3; inst_n=inst_n+1 )); do
 			echo "k=${i}" 
 			echo "trial=${t}" 
 
-			./my_clique_random.sh "$inst_n" "$i" "$t" "$solver" &>> "$output"
+			./sat_clique_random.sh "$inst_n" "$t" "$i" "$solver" &>> "$output"
 		done
 	done
 done
