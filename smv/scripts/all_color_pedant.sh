@@ -1,52 +1,37 @@
 #!/bin/bash
 
-# Load FF table
-# source ./ff_table.sh
-
-# Create result folder
 RESULT_DIR="../result/color/pedant/"
 mkdir -p "$RESULT_DIR"
+MAX_JOBS=8  # Max parallel jobs
 
-# Loop over FF numbers and colors
+function run_task {
+    FF_num=$1
+    color=$2
+    bench=$3
+
+    ins=$(basename "$bench" .blif)
+    output="${RESULT_DIR}/${ins}_C${color}_FF${FF_num}.log"
+
+    echo "$bench" &> "$output"
+    echo "Instance=${ins}" &>> "$output"
+    echo "color=${color}" &>> "$output"
+    echo "FF_tokeep=${FF_num}" &>> "$output"
+
+    ./pedant_color_smv.sh "$ins" "$color" "$FF_num" &>> "$output"
+}
+
+# Loop and launch tasks
 for (( FF_num=3; FF_num<=3; FF_num++ )); do
-    for (( i=2; i<=2; i++ )); do
-
-        # Loop over all .smv files in benchmarks/blif
+    for (( color=2; color<=2; color++ )); do
         for bench in ../benchmarks/blif/*.blif; do
-            echo "##############################"
-            echo "Processing: $bench"
-            echo "Current time: $(date)"
-
-            # Extract the base name without extension
-            ins=$(basename "$bench" .smv)
-
-            # Prepare output file
-            output="${RESULT_DIR}/${ins}_C${i}_FF${FF_num}.log"
-
-            echo "$bench" &> "$output"
-            echo "Instance=${ins}" &>> "$output"
-            echo "color=${i}" &>> "$output"
-            echo "FF_tokeep=${FF_num}" &>> "$output"
-
-            # Print to console
-            echo "Instance=${ins}"
-            echo "color=${i}"
-            echo "FF_tokeep=${FF_num}"
-
-            # Check FF threshold
-            # ff_threshold=${ff_table[$ins]}
-            # if [ -z "$ff_threshold" ]; then
-            #     echo "No FF number found for $ins, skipping..." &>> "$output"
-            #     continue
-            # fi
-            # if (( ff_threshold < FF_num )); then
-            #     echo "$ins skip (threshold=$ff_threshold, FF_num=$FF_num)" &>> "$output"
-            #     continue
-            # fi
-
-            # Call the new script
-            ./pedant_color_smv.sh "$ins" "$i" "$FF_num" &>> "$output"
-
+            run_task "$FF_num" "$color" "$bench" &
+            
+            # Wait if we reach max parallel jobs
+            while (( $(jobs -r | wc -l) >= MAX_JOBS )); do
+                sleep 1
+            done
         done
     done
 done
+
+wait  # Wait for remaining jobs
