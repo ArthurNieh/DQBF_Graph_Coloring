@@ -5,11 +5,11 @@
 ######################################################
 
 blif_file=$1
-colorability=$2
+clique=$2
 FF_tokeep=$3
 
-if [ -z "$blif_file" ] || [ -z "$colorability" ] || [ -z "$FF_tokeep" ]; then
-    echo "Usage: $0 <blif_file> <colorability> <FF_tokeep>"
+if [ -z "$blif_file" ] || [ -z "$clique" ] || [ -z "$FF_tokeep" ]; then
+    echo "Usage: $0 <blif_file> <clique> <FF_tokeep>"
     exit 1
 fi
 
@@ -30,7 +30,7 @@ ROOT_DIR=$(cd "$SMV_DIR/.." && pwd)
 BLIF_DIR="$SMV_DIR/benchmarks/blif"
 SIMPLIFIED_DIR="$SMV_DIR/benchmarks/simplified_blif"
 COMB_DIR="$SMV_DIR/benchmarks/combinational_blif"
-SAMPLE_DIR="$SMV_DIR/sample/color/pedant"
+SAMPLE_DIR="$SMV_DIR/sample/clique/pedant"
 
 # External tools
 ABC_DQBF_DIR="$ROOT_DIR/abc/dqbf"
@@ -43,7 +43,7 @@ PEDANT_BIN="$ROOT_DIR/pedant-solver/build/src/pedant"
 BLIF_IN="$BLIF_DIR/$blif_file"
 SIMPLIFIED_BLIF="$SIMPLIFIED_DIR/${blif_file}_simplified${FF_tokeep}.blif"
 COMB_BLIF="$COMB_DIR/${blif_file}_combinational${FF_tokeep}.blif"
-SAMPLE_BLIF="$SAMPLE_DIR/${blif_file}_FF${FF_tokeep}_color${colorability}_sample.blif"
+SAMPLE_BLIF="$SAMPLE_DIR/${blif_file}_FF${FF_tokeep}_clique${clique}_sample.blif"
 
 ABC_OUTPUT_FILE=$(mktemp)
 CNF_OUTPUT_FILE=$(mktemp)
@@ -87,18 +87,17 @@ python3 "$SMV_DIR/to_combinational_blif.py" \
     --abc "$ABC_OUTPUT_FILE"
 
 ######################################################
-# Step 3: Generate colored SMV/BLIF
+# Step 3: Generate clique SMV/BLIF
 ######################################################
 
 echo "######################################################"
-echo "Generate colored BLIF"
-
+echo "Generate clique BLIF"
 start2=$(date +%s.%N)
 
-python3 "$SMV_DIR/blif_gen_smv_coloring.py" \
+python3 "$SMV_DIR/blif_gen_smv_clique.py" \
     -i "$COMB_BLIF" \
     -o "$SAMPLE_BLIF" \
-    -c "$colorability" \
+    -c "$clique" \
     --abc "$ABC_OUTPUT_FILE"
 
 ######################################################
@@ -109,13 +108,13 @@ echo "######################################################"
 echo "Generate DQDIMACS file"
 
 if [ ! -f "$SAMPLE_BLIF" ]; then
-    echo "ERROR: Colored BLIF not found: $SAMPLE_BLIF"
+    echo "ERROR: Clique BLIF not found: $SAMPLE_BLIF"
     exit 1
 fi
 
 start3=$(date +%s.%N)
 
-python3 "$ABC_DQBF_DIR/smv_convert_to_cnf.py" \
+python3 "$ABC_DQBF_DIR/smv_convert_to_cnf_clique.py" \
     -i "$SAMPLE_BLIF" \
     -c "$CNF_OUTPUT_FILE" \
     -d "$DQDIMACS_OUTPUT_FILE"

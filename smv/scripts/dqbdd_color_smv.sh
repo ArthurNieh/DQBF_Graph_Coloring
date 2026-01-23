@@ -30,11 +30,11 @@ ROOT_DIR=$(cd "$SMV_DIR/.." && pwd)
 BLIF_DIR="$SMV_DIR/benchmarks/blif"
 SIMPLIFIED_DIR="$SMV_DIR/benchmarks/simplified_blif"
 COMB_DIR="$SMV_DIR/benchmarks/combinational_blif"
-SAMPLE_DIR="$SMV_DIR/sample/color/pedant"
+SAMPLE_DIR="$SMV_DIR/sample/color/dqbdd"
 
 # External tools
 ABC_DQBF_DIR="$ROOT_DIR/abc/dqbf"
-PEDANT_BIN="$ROOT_DIR/pedant-solver/build/src/pedant"
+SOLVER_BIN="$ROOT_DIR/../bin/dqbdd"
 
 ######################################################
 # Files
@@ -53,7 +53,7 @@ DQDIMACS_OUTPUT_FILE=$(mktemp)
 # Sanity checks
 ######################################################
 
-for f in "$BLIF_IN" "$PEDANT_BIN"; do
+for f in "$BLIF_IN" "$SOLVER_BIN"; do
     if [ ! -e "$f" ]; then
         echo "ERROR: Missing file $f"
         exit 1
@@ -121,15 +121,15 @@ python3 "$ABC_DQBF_DIR/smv_convert_to_cnf.py" \
     -d "$DQDIMACS_OUTPUT_FILE"
 
 ######################################################
-# Step 5: Run DQBF solver (pedant)
+# Step 5: Run DQBDD solver
 ######################################################
 
 echo "######################################################"
-echo "Run pedant solver"
+echo "Run DQBDD solver"
 
 start4=$(date +%s.%N)
 
-timeout 1h "$PEDANT_BIN" "$DQDIMACS_OUTPUT_FILE" --cnf model
+timeout 1h "$SOLVER_BIN" "$DQDIMACS_OUTPUT_FILE"
 
 end=$(date +%s.%N)
 
@@ -145,7 +145,7 @@ echo
 echo "================ Runtime Summary ================"
 echo "Coloring generation : $runtime_coloring s"
 echo "DQDIMACS generation : $runtime_cnf s"
-echo "Pedant solver       : $runtime_pedant s"
+echo "DQBDD solver       : $runtime_pedant s"
 echo "================================================="
 
 # Cleanup

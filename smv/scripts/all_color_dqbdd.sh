@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RESULT_DIR="../result/color/pedant/"
+RESULT_DIR="../result/color/dqbdd/"
 mkdir -p "$RESULT_DIR"
 MAX_JOBS=8  # Max parallel jobs
 
@@ -17,7 +17,7 @@ function run_task {
     echo "color=${color}" &>> "$output"
     echo "FF_tokeep=${FF_num}" &>> "$output"
 
-    ./pedant_color_smv.sh "$ins.blif" "$color" "$FF_num" &>> "$output"
+    ./dqbdd_color_smv.sh "$ins.blif" "$color" "$FF_num" &>> "$output"
 }
 
 # Loop and launch tasks

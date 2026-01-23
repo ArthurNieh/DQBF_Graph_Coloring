@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RESULT_DIR="../result/color/pedant/"
+RESULT_DIR="../result/clique/pedant/"
 mkdir -p "$RESULT_DIR"
 MAX_JOBS=8  # Max parallel jobs
 
@@ -12,17 +12,19 @@ function run_task {
     ins=$(basename "$bench" .blif)
     output="${RESULT_DIR}/${ins}_C${color}_FF${FF_num}.log"
 
+    echo "[Clique][Pedant] ${ins} with color=${color} and FF_tokeep=${FF_num}"
+
     echo "$bench" &> "$output"
     echo "Instance=${ins}" &>> "$output"
     echo "color=${color}" &>> "$output"
     echo "FF_tokeep=${FF_num}" &>> "$output"
 
-    ./pedant_color_smv.sh "$ins.blif" "$color" "$FF_num" &>> "$output"
+    ./pedant_clique_smv.sh "$ins.blif" "$color" "$FF_num" &>> "$output"
 }
 
 # Loop and launch tasks
 for (( FF_num=3; FF_num<=16; FF_num++ )); do
-    for (( color=2; color<=5; color++ )); do
+    for (( color=3; color<=8; color++ )); do
         for bench in ../benchmarks/blif/*.blif; do
             run_task "$FF_num" "$color" "$bench" &
             
