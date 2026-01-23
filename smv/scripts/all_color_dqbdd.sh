@@ -12,6 +12,8 @@ function run_task {
     ins=$(basename "$bench" .blif)
     output="${RESULT_DIR}/${ins}_C${color}_FF${FF_num}.log"
 
+    echo "[Color][DQBDD] ${ins} with color=${color} and FF_tokeep=${FF_num}"
+
     echo "$bench" &> "$output"
     echo "Instance=${ins}" &>> "$output"
     echo "color=${color}" &>> "$output"

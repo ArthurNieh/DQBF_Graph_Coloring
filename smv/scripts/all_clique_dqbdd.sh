@@ -23,7 +23,7 @@ function run_task {
 }
 
 # Loop and launch tasks
-for (( FF_num=3; FF_num<=16; FF_num++ )); do
+for (( FF_num=17; FF_num<=39; FF_num++ )); do
     for (( color=3; color<=8; color++ )); do
         for bench in ../benchmarks/blif/*.blif; do
             run_task "$FF_num" "$color" "$bench" &
