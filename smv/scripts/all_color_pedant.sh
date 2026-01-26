@@ -22,18 +22,33 @@ function run_task {
     ./pedant_color_smv.sh "$ins.blif" "$color" "$FF_num" &>> "$output"
 }
 
+function count_latches {
+    local blif_file=$1
+    grep -c '^\.latch' "$blif_file"
+}
+
 # Loop and launch tasks
 for (( FF_num=3; FF_num<=16; FF_num++ )); do
     for (( color=2; color<=5; color++ )); do
         for bench in ../benchmarks/blif/*.blif; do
+
+            latch_num=$(count_latches "$bench")
+
+            if (( FF_num > latch_num )); then
+                echo "[SKIP] $(basename "$bench") : FF_num=${FF_num} > latches=${latch_num}"
+                continue
+            fi
+
             run_task "$FF_num" "$color" "$bench" &
-            
+
             # Wait if we reach max parallel jobs
             while (( $(jobs -r | wc -l) >= MAX_JOBS )); do
                 sleep 1
             done
+
         done
     done
 done
+
 
 wait  # Wait for remaining jobs
