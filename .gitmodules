@@ -16,3 +16,6 @@
 [submodule "SharpSSAT"]
 	path = SharpSSAT
 	url = git@github.com:ArthurNieh/SharpSSAT.git
+[submodule "SAT-based-CEGAR"]
+	path = SAT-based-CEGAR
+	url = https://github.com/TakehideSoh/SAT-based-CEGAR
